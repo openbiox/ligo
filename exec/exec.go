@@ -7,8 +7,8 @@ import (
 	"os/exec"
 	"strings"
 
-	cio "github.com/openbiox/bioctl/io"
-	clog "github.com/openbiox/bioctl/log"
+	cio "github.com/openbiox/ligo/io"
+	clog "github.com/openbiox/ligo/log"
 	"github.com/sirupsen/logrus"
 )
 

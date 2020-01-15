@@ -9,8 +9,8 @@ import (
 )
 
 func TestHttpGetURLs(t *testing.T) {
-	urls := []string{"https://raw.githubusercontent.com/openbiox/bioctl/master/net/core.go",
-		"https://raw.githubusercontent.com/openbiox/bioctl/master/net/rename.go",
+	urls := []string{"https://raw.githubusercontent.com/openbiox/ligo/master/net/core.go",
+		"https://raw.githubusercontent.com/openbiox/ligo/master/net/rename.go",
 		"https://github.com/Miachol/github_demo", "git@github.com:Miachol/github_demo.git"}
 	destDir := []string{os.TempDir(), os.TempDir(), os.TempDir(), os.TempDir() + "/github_demo"}
 	param := &Params{}

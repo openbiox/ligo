@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/gocolly/colly"
-	"github.com/openbiox/bioctl/stringo"
+	"github.com/openbiox/ligo/stringo"
 )
 
 // SetCollyProxy set colly.Collector with proxy

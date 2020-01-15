@@ -8,7 +8,7 @@ import (
 	"os"
 
 	jsoniter "github.com/json-iterator/go"
-	stringo "github.com/openbiox/bioctl/stringo"
+	stringo "github.com/openbiox/ligo/stringo"
 	"github.com/tidwall/pretty"
 )
 

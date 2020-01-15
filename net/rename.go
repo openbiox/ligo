@@ -7,7 +7,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/openbiox/bioctl/stringo"
+	"github.com/openbiox/ligo/stringo"
 )
 
 func FormatURLfileName(url string, remoteName bool, timeout int, proxy string) (fname string) {

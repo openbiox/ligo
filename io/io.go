@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	clog "github.com/openbiox/bioctl/log"
+	clog "github.com/openbiox/ligo/log"
 )
 
 var log = clog.Logger

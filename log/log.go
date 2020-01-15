@@ -31,8 +31,8 @@ func New() *logrus.Logger {
 }
 
 // SetQuietLog Set quiet log
-func SetQuietLog(log *logrus.Logger, quite string) {
-	if quite == "true" {
+func SetQuietLog(log *logrus.Logger, quite bool) {
+	if quite {
 		log.SetOutput(ioutil.Discard)
 	} else {
 		log.SetOutput(os.Stderr)
@@ -40,7 +40,7 @@ func SetQuietLog(log *logrus.Logger, quite string) {
 }
 
 // SetLogStream set log output stream
-func SetLogStream(quiet bool, saveLog bool, logCon *io.Writer) {
+func SetLogStream(log *logrus.Logger, quiet bool, saveLog bool, logCon *io.Writer) {
 	if quiet && !saveLog {
 		log.SetOutput(ioutil.Discard)
 	} else if quiet && saveLog {

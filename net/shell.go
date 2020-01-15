@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	cio "github.com/openbiox/bioctl/io"
+	cio "github.com/openbiox/ligo/io"
 )
 
 func setWgetCmds(url string, destFn string, opt *Params) *exec.Cmd {

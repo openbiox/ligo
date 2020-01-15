@@ -11,8 +11,8 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	cio "github.com/openbiox/bioctl/io"
-	"github.com/openbiox/bioctl/stringo"
+	cio "github.com/openbiox/ligo/io"
+	"github.com/openbiox/ligo/stringo"
 	mpb "github.com/vbauerster/mpb/v4"
 	"github.com/vbauerster/mpb/v4/decor"
 )

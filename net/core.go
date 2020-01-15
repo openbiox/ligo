@@ -13,7 +13,7 @@ import (
 	"sync"
 	"time"
 
-	cio "github.com/openbiox/bioctl/io"
+	cio "github.com/openbiox/ligo/io"
 )
 
 // HTTPGetURLs can use golang http.Get and external commandline tools including wget, curl, axel, git and rsync

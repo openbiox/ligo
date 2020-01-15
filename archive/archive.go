@@ -6,8 +6,8 @@ import (
 	"path"
 
 	"github.com/mholt/archiver"
-	clog "github.com/openbiox/bioctl/log"
-	"github.com/openbiox/bioctl/stringo"
+	clog "github.com/openbiox/ligo/log"
+	"github.com/openbiox/ligo/stringo"
 )
 
 var log = clog.Logger

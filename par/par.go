@@ -2,6 +2,7 @@ package par
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"os/user"
@@ -12,10 +13,10 @@ import (
 	"sync"
 	"time"
 
-	bexec "github.com/openbiox/bioctl/exec"
-	cio "github.com/openbiox/bioctl/io"
-	clog "github.com/openbiox/bioctl/log"
-	"github.com/openbiox/bioctl/stringo"
+	bexec "github.com/openbiox/ligo/exec"
+	cio "github.com/openbiox/ligo/io"
+	clog "github.com/openbiox/ligo/log"
+	"github.com/openbiox/ligo/stringo"
 	"github.com/vbauerster/mpb/v4"
 	"github.com/vbauerster/mpb/v4/decor"
 )
@@ -29,15 +30,24 @@ type ClisT struct {
 	Thread      int
 	TaskID      string
 	LogDir      string
+	SaveLog     string
 	Quiet       string
 }
 
 var log = clog.Logger
 
 // Tasks parallel run tasks
-func Tasks(parClis *ClisT) error {
+func Tasks(parClis *ClisT) (err error) {
 	index2 := []int{}
-	clog.SetQuietLog(log, parClis.Quiet)
+	//clog.SetQuietLog(log, parClis.Quiet == "true")
+	if err := cio.CreateDir(parClis.LogDir); err != nil {
+		return err
+	}
+	var logCon io.Writer
+	if logCon, err = cio.Open(fmt.Sprintf("%s/%s.log", parClis.LogDir, parClis.TaskID)); err != nil {
+		return err
+	}
+	clog.SetLogStream(log, parClis.Quiet == "true", parClis.SaveLog == "true", &logCon)
 	if parClis.Index != "" {
 		index := strings.Split(parClis.Index, ",")
 		for i := range index {
@@ -73,7 +83,7 @@ func Tasks(parClis *ClisT) error {
 		mpb.WithWidth(60),
 	)
 	wg.Add(len(index2))
-	err := cio.CreateDir(parClis.LogDir)
+	err = cio.CreateDir(parClis.LogDir)
 	if err != nil {
 		return err
 	}

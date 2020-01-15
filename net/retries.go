@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	"time"
 
-	bexec "github.com/openbiox/bioctl/exec"
+	bexec "github.com/openbiox/ligo/exec"
 )
 
 // RetriesClient http.Client and requenst with retries

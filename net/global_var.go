@@ -5,7 +5,7 @@ import (
 	"net/http/cookiejar"
 	"sync"
 
-	clog "github.com/openbiox/bioctl/log"
+	clog "github.com/openbiox/ligo/log"
 	mpb "github.com/vbauerster/mpb/v4"
 )
 

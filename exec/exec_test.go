@@ -8,7 +8,7 @@ import (
 	"path"
 	"testing"
 
-	cio "github.com/openbiox/bioctl/io"
+	cio "github.com/openbiox/ligo/io"
 )
 
 func TestRunExecCmdConsole(t *testing.T) {
