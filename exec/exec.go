@@ -25,7 +25,7 @@ func System(cmd *exec.Cmd, logPath string, quiet bool) error {
 	stdoutIn, _ := cmd.StdoutPipe()
 	stderrIn, _ := cmd.StderrPipe()
 
-	var log = clog.New()
+	var log = clog.New2()
 	var logBash = log.WithFields(logrus.Fields{
 		"prefix": "BASH"})
 
@@ -68,12 +68,9 @@ func System(cmd *exec.Cmd, logPath string, quiet bool) error {
 	for i := range errs {
 		if errs[i] != nil {
 			log.Warningf("cmd.Run() failed with %s\n", errs[i])
-			log.SetOutput(os.Stderr)
 			return errs[i]
 		}
 	}
-
-	log.SetOutput(os.Stderr)
 	return nil
 }
 

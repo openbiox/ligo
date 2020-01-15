@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"os/user"
+	"path/filepath"
 	"runtime"
 	"sort"
 	"strconv"
@@ -34,20 +35,25 @@ type ClisT struct {
 	Quiet       string
 }
 
-var log = clog.Logger
-
 // Tasks parallel run tasks
 func Tasks(parClis *ClisT) (err error) {
+	var log = clog.Logger
+
 	index2 := []int{}
-	//clog.SetQuietLog(log, parClis.Quiet == "true")
-	if err := cio.CreateDir(parClis.LogDir); err != nil {
-		return err
-	}
 	var logCon io.Writer
-	if logCon, err = cio.Open(fmt.Sprintf("%s/%s.log", parClis.LogDir, parClis.TaskID)); err != nil {
-		return err
+	var logDir = parClis.LogDir
+	var logPrefix string
+
+	if parClis.SaveLog == "true" {
+		if logDir == "" {
+			logDir = filepath.Join(os.TempDir(), "_log")
+		}
+		logPrefix = fmt.Sprintf("%s/%s", logDir, parClis.TaskID)
+		cio.CreateDir(logDir)
+		logCon, _ = cio.Open(logPrefix + ".log")
 	}
 	clog.SetLogStream(log, parClis.Quiet == "true", parClis.SaveLog == "true", &logCon)
+
 	if parClis.Index != "" {
 		index := strings.Split(parClis.Index, ",")
 		for i := range index {
@@ -83,13 +89,14 @@ func Tasks(parClis *ClisT) (err error) {
 		mpb.WithWidth(60),
 	)
 	wg.Add(len(index2))
-	err = cio.CreateDir(parClis.LogDir)
-	if err != nil {
-		return err
-	}
+
 	logSlice := []string{}
 	for i := range index2 {
-		logSlice = append(logSlice, fmt.Sprintf("%s/%s-%d.log", parClis.LogDir, parClis.TaskID, i+1))
+		if parClis.SaveLog == "true" {
+			logSlice = append(logSlice, fmt.Sprintf("%s-%d.log", logPrefix, i+1))
+		} else {
+			logSlice = append(logSlice, "")
+		}
 	}
 	log.Infof("Total %d tasks were submited (%s | %s).", len(index2), parClis.TaskID, parClis.Index)
 	log.Infof("Timestamp: %s", time.Now())
@@ -99,7 +106,9 @@ func Tasks(parClis *ClisT) (err error) {
 	log.Infof("Hostname: %s, Username: %s", hostname, user.Username)
 	wd, _ := os.Getwd()
 	log.Infof("Platform: %s, Working: %s", platform, wd)
-	log.Infof("Task log from #1 to #%d will be saved in %s/%s-*.log .", len(index2), parClis.LogDir, parClis.TaskID)
+	if parClis.SaveLog == "true" {
+		log.Infof("Task log from #1 to #%d will be saved in %s-*.log .", len(index2), logPrefix)
+	}
 	errorMsg := make(map[int]string)
 	var lock sync.Mutex
 	total := 100

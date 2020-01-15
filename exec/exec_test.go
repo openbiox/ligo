@@ -16,7 +16,7 @@ func TestRunExecCmdConsole(t *testing.T) {
 	cmd := exec.Command("wget", args...)
 	dir := os.TempDir()
 	logPath := path.Join(dir, "TestRunExecCmdConsole.log")
-	Shell(cmd, logPath, false)
+	System(cmd, logPath, false)
 	if hasFile, _ := cio.PathExists(logPath); hasFile {
 		if !(cio.FileSize(logPath) > 0) {
 			log.Fatalf("%s not created.", logPath)
@@ -28,7 +28,7 @@ func TestRunExecCmdConsole(t *testing.T) {
 		}
 	}
 	cmd = exec.Command("wget", args...)
-	Shell(cmd, "", false)
+	System(cmd, "", false)
 	if hasFile, _ := cio.PathExists(logPath); hasFile {
 		log.Fatalf("%s should not be created.", logPath)
 	}
@@ -36,13 +36,13 @@ func TestRunExecCmdConsole(t *testing.T) {
 	fmt.Println("quite mode")
 	args = []string{"-c", "https://raw.githubusercontent.com/openbiox/bioctl/master/main.go"}
 	cmd = exec.Command("wget", args...)
-	Shell(cmd, "", true)
+	System(cmd, "", true)
 	if hasFile, _ := cio.PathExists(logPath); hasFile {
 		log.Fatalf("%s should not be created.", logPath)
 	}
 	fmt.Println("quite mode and save log")
 	cmd = exec.Command("wget", args...)
-	Shell(cmd, logPath, true)
+	System(cmd, logPath, true)
 	if hasFile, _ := cio.PathExists(logPath); !hasFile {
 		log.Fatalf("%s should be created.", logPath)
 	}

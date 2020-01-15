@@ -30,6 +30,13 @@ func New() *logrus.Logger {
 	return logrus.New()
 }
 
+// New2 Creates a new logger with time.
+func New2() *logrus.Logger {
+	l := logrus.New()
+	SetClassicStyle(l)
+	return l
+}
+
 // SetQuietLog Set quiet log
 func SetQuietLog(log *logrus.Logger, quite bool) {
 	if quite {
