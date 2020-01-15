@@ -102,17 +102,17 @@ func downloadWorker(client *http.Client, req *http.Request, url string, destFn s
 	defer dest.Close()
 	prefixStr := filepath.Base(destFn)
 	prefixStrLen := utf8.RuneCountInString(prefixStr)
-	if prefixStrLen > 35 {
-		prefixStr = prefixStr[0:31] + "..."
+	if prefixStrLen >= 18 {
+		prefixStr = prefixStr[0:17] + "..."
 	}
-	prefixStr = fmt.Sprintf("%-35s\t", prefixStr)
+	prefixStr = fmt.Sprintf("%-18s\t", prefixStr)
 	if !opt.Quiet {
 		bar := opt.Pbar.AddBar(size,
 			mpb.BarStyle("[=>-|"),
 			mpb.PrependDecorators(
 				decor.Name(prefixStr, decor.WC{W: len(prefixStr) + 1, C: decor.DidentRight}),
 				decor.CountersKibiByte("% -.1f / % -.1f\t"),
-				decor.OnComplete(decor.Percentage(decor.WC{W: 5}), " "+"√"),
+				decor.OnComplete(decor.Percentage(decor.WC{W: 4}), " "+"√"),
 			),
 			mpb.AppendDecorators(
 				decor.EwmaETA(decor.ET_STYLE_MMSS, float64(size)/2048),

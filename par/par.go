@@ -34,8 +34,9 @@ type ClisT struct {
 	Thread      int
 	TaskID      string
 	LogDir      string
-	SaveLog     string
-	Quiet       string
+	SaveLog     bool
+	// Verbose: verbose level (0: no output, 1: basic output)
+	Verbose int
 }
 
 // Tasks parallel run tasks
@@ -46,10 +47,10 @@ func Tasks(parClis *ClisT) (err error) {
 	var logCon io.Writer
 	var logDir = parClis.LogDir
 	var logPrefix string
-	var quiet = parClis.Quiet == "true"
-	var saveLog = parClis.SaveLog == "true"
+	var quiet = parClis.Verbose == 0
+	var saveLog = parClis.SaveLog
 
-	if parClis.SaveLog == "true" {
+	if parClis.SaveLog {
 		if logDir == "" {
 			logDir = filepath.Join(os.TempDir(), "_log")
 		}
@@ -88,12 +89,12 @@ func Tasks(parClis *ClisT) (err error) {
 	sort.Sort(sort.IntSlice(index2))
 
 	sem := make(chan bool, parClis.Thread)
-	p := NewMpb(quiet, saveLog, logCon)
+	p := NewMpb(quiet, saveLog, &logCon)
 	wg.Add(len(index2))
 
 	logSlice := []string{}
 	for i := range index2 {
-		if parClis.SaveLog == "true" {
+		if parClis.SaveLog {
 			logSlice = append(logSlice, fmt.Sprintf("%s-%d.log", logPrefix, i+1))
 		} else {
 			logSlice = append(logSlice, "")
@@ -107,8 +108,8 @@ func Tasks(parClis *ClisT) (err error) {
 	log.Infof("Hostname: %s, Username: %s", hostname, user.Username)
 	wd, _ := os.Getwd()
 	log.Infof("Platform: %s, Working: %s", platform, wd)
-	if parClis.SaveLog == "true" {
-		log.Infof("Task log from #1 to #%d will be saved in %s-*.log .", len(index2), logPrefix)
+	if parClis.SaveLog {
+		log.Infof("Task log from #1 to #%d will be saved in %s-*.log", len(index2), logPrefix)
 	}
 	errorMsg := make(map[int]string)
 	var lock sync.Mutex
@@ -193,9 +194,9 @@ func Tasks(parClis *ClisT) (err error) {
 }
 
 // NewMpb create mpb.Progress and with log context
-func NewMpb(quiet bool, saveLog bool, logCon io.Writer) (p *mpb.Progress) {
+func NewMpb(quiet bool, saveLog bool, logCon *io.Writer) (p *mpb.Progress) {
 	writers := []io.Writer{
-		logCon,
+		*logCon,
 		os.Stderr}
 	fileAndStdoutWriter := io.MultiWriter(writers...)
 	if !quiet && saveLog {
@@ -214,8 +215,8 @@ func NewMpb(quiet bool, saveLog bool, logCon io.Writer) (p *mpb.Progress) {
 		)
 	} else if quiet && saveLog {
 		p = mpb.New(
-			mpb.WithOutput(logCon),
-			mpb.WithDebugOutput(logCon),
+			mpb.WithOutput(*logCon),
+			mpb.WithDebugOutput(*logCon),
 			mpb.WithWaitGroup(&wg),
 			mpb.WithWidth(108),
 		)

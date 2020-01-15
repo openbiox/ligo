@@ -5,8 +5,8 @@ import "testing"
 func TestTasks(t *testing.T) {
 	a := ClisT{
 		LogDir:  "/tmp/_log1",
-		Quiet:   "false",
-		SaveLog: "false",
+		Verbose: 1,
+		SaveLog: false,
 		TaskID:  "test123",
 		Index:   "1,2,3",
 		Script:  "echo {{index}}",
@@ -15,8 +15,8 @@ func TestTasks(t *testing.T) {
 	Tasks(&a)
 	b := ClisT{
 		LogDir:  "/tmp/_log2",
-		Quiet:   "false",
-		SaveLog: "true",
+		Verbose: 1,
+		SaveLog: true,
 		TaskID:  "test123",
 		Index:   "1,2,3",
 		Script:  "echo {{index}}",
@@ -25,8 +25,8 @@ func TestTasks(t *testing.T) {
 	Tasks(&b)
 	c := ClisT{
 		LogDir:  "/tmp/_log3",
-		Quiet:   "true",
-		SaveLog: "true",
+		Verbose: 0,
+		SaveLog: true,
 		TaskID:  "test123",
 		Index:   "1,2,3",
 		Script:  "echo {{index}}",
