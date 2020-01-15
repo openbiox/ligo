@@ -3,6 +3,7 @@ package par
 import (
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"os/user"
@@ -21,6 +22,8 @@ import (
 	"github.com/vbauerster/mpb/v4"
 	"github.com/vbauerster/mpb/v4/decor"
 )
+
+var wg sync.WaitGroup
 
 // ClisT is the type of parameters of parTasks
 type ClisT struct {
@@ -43,6 +46,8 @@ func Tasks(parClis *ClisT) (err error) {
 	var logCon io.Writer
 	var logDir = parClis.LogDir
 	var logPrefix string
+	var quiet = parClis.Quiet == "true"
+	var saveLog = parClis.SaveLog == "true"
 
 	if parClis.SaveLog == "true" {
 		if logDir == "" {
@@ -52,7 +57,7 @@ func Tasks(parClis *ClisT) (err error) {
 		cio.CreateDir(logDir)
 		logCon, _ = cio.Open(logPrefix + ".log")
 	}
-	clog.SetLogStream(log, parClis.Quiet == "true", parClis.SaveLog == "true", &logCon)
+	clog.SetLogStream(log, quiet, saveLog, &logCon)
 
 	if parClis.Index != "" {
 		index := strings.Split(parClis.Index, ",")
@@ -83,11 +88,7 @@ func Tasks(parClis *ClisT) (err error) {
 	sort.Sort(sort.IntSlice(index2))
 
 	sem := make(chan bool, parClis.Thread)
-	var wg sync.WaitGroup
-	p := mpb.New(
-		mpb.WithWaitGroup(&wg),
-		mpb.WithWidth(60),
-	)
+	p := NewMpb(quiet, saveLog, logCon)
 	wg.Add(len(index2))
 
 	logSlice := []string{}
@@ -189,4 +190,42 @@ func Tasks(parClis *ClisT) (err error) {
 		}
 	}
 	return nil
+}
+
+// NewMpb create mpb.Progress and with log context
+func NewMpb(quiet bool, saveLog bool, logCon io.Writer) (p *mpb.Progress) {
+	writers := []io.Writer{
+		logCon,
+		os.Stderr}
+	fileAndStdoutWriter := io.MultiWriter(writers...)
+	if !quiet && saveLog {
+		p = mpb.New(
+			mpb.WithOutput(fileAndStdoutWriter),
+			mpb.WithDebugOutput(fileAndStdoutWriter),
+			mpb.WithWaitGroup(&wg),
+			mpb.WithWidth(108),
+		)
+	} else if !quiet && !saveLog {
+		p = mpb.New(
+			mpb.WithWaitGroup(&wg),
+			mpb.WithWidth(60),
+			mpb.WithOutput(os.Stderr),
+			mpb.WithDebugOutput(os.Stderr),
+		)
+	} else if quiet && saveLog {
+		p = mpb.New(
+			mpb.WithOutput(logCon),
+			mpb.WithDebugOutput(logCon),
+			mpb.WithWaitGroup(&wg),
+			mpb.WithWidth(108),
+		)
+	} else if quiet && !saveLog {
+		p = mpb.New(
+			mpb.WithWaitGroup(&wg),
+			mpb.WithWidth(60),
+			mpb.WithOutput(ioutil.Discard),
+			mpb.WithDebugOutput(ioutil.Discard),
+		)
+	}
+	return p
 }
