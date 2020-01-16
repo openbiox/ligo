@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"runtime"
 	"sort"
 	"sync"
 )
@@ -61,13 +60,7 @@ func LineCounter(r io.Reader) (int64, error) {
 	var err error
 	var count int64
 	buf := make([]byte, 1024)
-	if runtime.GOOS == "linux" {
-		newLineChr = '\n'
-	} else if runtime.GOOS == "darwin" {
-		newLineChr = '\r'
-	} else {
-		newLineChr = '\n'
-	}
+	newLineChr = '\n'
 
 	for {
 		readSizeTmp, err = r.Read(buf)
