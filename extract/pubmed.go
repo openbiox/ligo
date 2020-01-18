@@ -1,4 +1,4 @@
-package parse
+package extract
 
 import (
 	"fmt"
@@ -24,16 +24,16 @@ type PubmedFields struct {
 	Keywords                                                  *[]string
 }
 
-func GetSimplePubmedFields(keywords *[]string, article *parse.PubmedArticle, callCor bool) *PubmedFields {
+func GetSimplePubmedFields(keywords *[]string, article *parse.PubmedArticleJSON, callCor bool) *PubmedFields {
 	year := article.MedlineCitation.Article.ArticleDate.Year
 	month := article.MedlineCitation.Article.ArticleDate.Month
 	day := article.MedlineCitation.Article.ArticleDate.Day
 	date := fmt.Sprintf("%s/%s/%s", year, month, day)
 	var pmid, doi, abs string
-	for _, v := range article.PubmedData.ArticleIdList.ArticleId {
-		if v.IdType == "pubmed" {
+	for _, v := range article.PubmedData.ArticleIDList.ArticleID {
+		if v.IDType == "pubmed" {
 			pmid = v.Text
-		} else if v.IdType == "doi" {
+		} else if v.IDType == "doi" {
 			doi = v.Text
 		}
 	}

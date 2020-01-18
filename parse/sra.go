@@ -322,3 +322,255 @@ type SRAFile struct {
 		Org        string `xml:"org,attr"`
 	} `xml:"Alternatives"`
 }
+
+type ExperimentPkgJSON struct {
+	EXPERIMENT struct {
+		Accession   string `json:"Accession"`
+		Alias       string `json:"Alias"`
+		IDENTIFIERS struct {
+			PRIMARYID string `json:"PRIMARYID"`
+		} `json:"IDENTIFIERS"`
+		TITLE    string `json:"TITLE"`
+		STUDYREF struct {
+			Accession   string `json:"Accession"`
+			IDENTIFIERS struct {
+				PRIMARYID  string `json:"PRIMARYID"`
+				EXTERNALID struct {
+					Namespace string `json:"Namespace"`
+				} `json:"EXTERNALID"`
+			} `json:"IDENTIFIERS"`
+		} `json:"STUDYREF"`
+		DESIGN struct {
+			DESIGNDESCRIPTION string `json:"DESIGNDESCRIPTION"`
+			SAMPLEDESCRIPTOR  struct {
+				Accession   string `json:"Accession"`
+				IDENTIFIERS struct {
+					PRIMARYID  string `json:"PRIMARYID"`
+					EXTERNALID struct {
+						Namespace string `json:"Namespace"`
+					} `json:"EXTERNALID"`
+				} `json:"IDENTIFIERS"`
+			} `json:"SAMPLEDESCRIPTOR"`
+			LIBRARYDESCRIPTOR struct {
+				LIBRARYNAME      string `json:"LIBRARYNAME"`
+				LIBRARYSTRATEGY  string `json:"LIBRARYSTRATEGY"`
+				LIBRARYSOURCE    string `json:"LIBRARYSOURCE"`
+				LIBRARYSELECTION string `json:"LIBRARYSELECTION"`
+				LIBRARYLAYOUT    struct {
+					PAIRED string `json:"PAIRED"`
+				} `json:"LIBRARYLAYOUT"`
+			} `json:"LIBRARYDESCRIPTOR"`
+		} `json:"DESIGN"`
+		PLATFORM struct {
+			ILLUMINA struct {
+				INSTRUMENTMODEL string `json:"INSTRUMENTMODEL"`
+			} `json:"ILLUMINA"`
+		} `json:"PLATFORM"`
+	} `json:"EXPERIMENT"`
+	SUBMISSION struct {
+		LabName     string `json:"LabName"`
+		CenterName  string `json:"CenterName"`
+		Accession   string `json:"Accession"`
+		Alias       string `json:"Alias"`
+		IDENTIFIERS struct {
+			PRIMARYID string `json:"PRIMARYID"`
+		} `json:"IDENTIFIERS"`
+	} `json:"SUBMISSION"`
+	Organization struct {
+		Type    string `json:"Type"`
+		Name    string `json:"Name"`
+		Address struct {
+			PostalCode  string `json:"PostalCode"`
+			Department  string `json:"Department"`
+			Institution string `json:"Institution"`
+			Street      string `json:"Street"`
+			City        string `json:"City"`
+			Country     string `json:"Country"`
+		} `json:"Address"`
+		Contact struct {
+			Email    string `json:"Email"`
+			SecEmail string `json:"SecEmail"`
+			Address  struct {
+				PostalCode  string `json:"PostalCode"`
+				Department  string `json:"Department"`
+				Institution string `json:"Institution"`
+				Street      string `json:"Street"`
+				City        string `json:"City"`
+				Country     string `json:"Country"`
+			} `json:"Address"`
+			Name struct {
+				First string `json:"First"`
+				Last  string `json:"Last"`
+			} `json:"Name"`
+		} `json:"Contact"`
+	} `json:"Organization"`
+	STUDY struct {
+		CenterName  string `json:"CenterName"`
+		Alias       string `json:"Alias"`
+		Accession   string `json:"Accession"`
+		IDENTIFIERS struct {
+			PRIMARYID  string `json:"PRIMARYID"`
+			EXTERNALID struct {
+				Namespace string `json:"Namespace"`
+				Label     string `json:"Label"`
+			} `json:"EXTERNALID"`
+		} `json:"IDENTIFIERS"`
+		DESCRIPTOR struct {
+			STUDYTITLE string `json:"STUDYTITLE"`
+			STUDYTYPE  struct {
+				ExistingStudyType string `json:"ExistingStudyType"`
+			} `json:"STUDYTYPE"`
+			STUDYABSTRACT     string `json:"STUDYABSTRACT"`
+			CENTERPROJECTNAME string `json:"CENTERPROJECTNAME"`
+		} `json:"DESCRIPTOR"`
+	} `json:"STUDY"`
+	SAMPLE struct {
+		Alias       string `json:"Alias"`
+		Accession   string `json:"Accession"`
+		IDENTIFIERS struct {
+			PRIMARYID  string `json:"PRIMARYID"`
+			EXTERNALID struct {
+				Namespace string `json:"Namespace"`
+			} `json:"EXTERNALID"`
+		} `json:"IDENTIFIERS"`
+		TITLE      string `json:"TITLE"`
+		SAMPLENAME struct {
+			TAXONID        string `json:"TAXONID"`
+			SCIENTIFICNAME string `json:"SCIENTIFICNAME"`
+		} `json:"SAMPLENAME"`
+		SAMPLELINKS struct {
+			SAMPLELINK struct {
+				XREFLINK struct {
+					DB    string `json:"DB"`
+					ID    string `json:"ID"`
+					LABEL string `json:"LABEL"`
+				} `json:"XREFLINK"`
+			} `json:"SAMPLELINK"`
+		} `json:"SAMPLELINKS"`
+		SAMPLEATTRIBUTES struct {
+			SAMPLEATTRIBUTE []struct {
+				TAG   string `json:"TAG"`
+				VALUE string `json:"VALUE"`
+			} `json:"SAMPLEATTRIBUTE"`
+		} `json:"SAMPLEATTRIBUTES"`
+	} `json:"SAMPLE"`
+	Pool struct {
+		Member struct {
+			MemberName  string `json:"MemberName"`
+			Accession   string `json:"Accession"`
+			SampleName  string `json:"SampleName"`
+			SampleTitle string `json:"SampleTitle"`
+			Spots       string `json:"Spots"`
+			Bases       string `json:"Bases"`
+			TaxID       string `json:"TaxID"`
+			Organism    string `json:"Organism"`
+			IDENTIFIERS struct {
+				PRIMARYID  string `json:"PRIMARYID"`
+				EXTERNALID struct {
+					Namespace string `json:"Namespace"`
+				} `json:"EXTERNALID"`
+			} `json:"IDENTIFIERS"`
+		} `json:"Member"`
+	} `json:"Pool"`
+	RUNSET struct {
+		RUN struct {
+			Accession           string `json:"Accession"`
+			Alias               string `json:"Alias"`
+			TotalSpots          string `json:"TotalSpots"`
+			TotalBases          string `json:"TotalBases"`
+			Size                string `json:"Size"`
+			LoadDone            string `json:"LoadDone"`
+			Published           string `json:"Published"`
+			IsPublic            string `json:"IsPublic"`
+			ClusterName         string `json:"ClusterName"`
+			StaticDataAvailable string `json:"StaticDataAvailable"`
+			IDENTIFIERS         struct {
+				PRIMARYID string `json:"PRIMARYID"`
+			} `json:"IDENTIFIERS"`
+			EXPERIMENTREF struct {
+				Accession   string `json:"Accession"`
+				IDENTIFIERS string `json:"IDENTIFIERS"`
+			} `json:"EXPERIMENTREF"`
+			Pool struct {
+				Member struct {
+					MemberName  string `json:"MemberName"`
+					Accession   string `json:"Accession"`
+					SampleName  string `json:"SampleName"`
+					SampleTitle string `json:"SampleTitle"`
+					Spots       string `json:"Spots"`
+					Bases       string `json:"Bases"`
+					TaxID       string `json:"TaxID"`
+					Organism    string `json:"Organism"`
+					IDENTIFIERS struct {
+						PRIMARYID  string `json:"PRIMARYID"`
+						EXTERNALID struct {
+							Namespace string `json:"Namespace"`
+						} `json:"EXTERNALID"`
+					} `json:"IDENTIFIERS"`
+				} `json:"Member"`
+			} `json:"Pool"`
+			SRAFiles struct {
+				SRAFile SRAFileJSON `json:"SRAFile"`
+			} `json:"SRAFiles"`
+			CloudFiles struct {
+				CloudFile []struct {
+					Filetype string `json:"Filetype"`
+					Provider string `json:"Provider"`
+					Location string `json:"Location"`
+				} `json:"CloudFile"`
+			} `json:"CloudFiles"`
+			Statistics struct {
+				Nreads string `json:"Nreads"`
+				Nspots string `json:"Nspots"`
+				Read   []struct {
+					Index   string `json:"Index"`
+					Count   string `json:"Count"`
+					Average string `json:"Average"`
+					Stdev   string `json:"Stdev"`
+				} `json:"Read"`
+			} `json:"Statistics"`
+			Databases struct {
+				Database struct {
+					Table struct {
+						Name       string `json:"Name"`
+						Statistics struct {
+							Source string `json:"Source"`
+							Rows   struct {
+								Count string `json:"Count"`
+							} `json:"Rows"`
+							Elements struct {
+								Count string `json:"Count"`
+							} `json:"Elements"`
+						} `json:"Statistics"`
+					} `json:"Table"`
+				} `json:"Database"`
+			} `json:"Databases"`
+			Bases struct {
+				CsNative string `json:"CsNative"`
+				Count    string `json:"Count"`
+				Base     []struct {
+					Value string `json:"Value"`
+					Count string `json:"Count"`
+				} `json:"Base"`
+			} `json:"Bases"`
+		} `json:"RUN"`
+	} `json:"RUNSET"`
+}
+
+type SRAFileJSON struct {
+	Cluster      string `json:"Cluster"`
+	Filename     string `json:"Filename"`
+	URL          string `json:"URL"`
+	Size         string `json:"Size"`
+	Date         string `json:"Date"`
+	Md5          string `json:"Md5"`
+	SemanticName string `json:"SemanticName"`
+	Supertype    string `json:"Supertype"`
+	Sratoolkit   string `json:"Sratoolkit"`
+	Alternatives []struct {
+		URL        string `json:"URL"`
+		FreeEgress string `json:"FreeEgress"`
+		AccessType string `json:"AccessType"`
+		Org        string `json:"Org"`
+	} `json:"Alternatives"`
+}

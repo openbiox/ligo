@@ -211,3 +211,147 @@ type ArticleId struct {
 	Text   string `xml:",chardata"`
 	IdType string `xml:"IdType,attr"`
 }
+
+type PubmedArticleJSON struct {
+	MedlineCitation MedlineCitationJson `json:"MedlineCitation"`
+	PubmedData      PubmedDataJSON      `json:"PubmedData"`
+}
+
+type PubmedDataJSON struct {
+	History struct {
+		PubMedPubDate []struct {
+			PubStatus string `json:"PubStatus"`
+			Year      string `json:"Year"`
+			Month     string `json:"Month"`
+			Day       string `json:"Day"`
+			Hour      string `json:"Hour"`
+			Minute    string `json:"Minute"`
+		} `json:"PubMedPubDate"`
+	} `json:"History"`
+	PublicationStatus string `json:"PublicationStatus"`
+	ArticleIDList     struct {
+		ArticleID []struct {
+			Text   string `json:"Text"`
+			IDType string `json:"IdType"`
+		} `json:"ArticleId"`
+	} `json:"ArticleIdList"`
+	ReferenceList struct {
+		Reference struct {
+			Citation      string `json:"Citation"`
+			ArticleIDList struct {
+				ArticleID struct {
+					Text   string `json:"Text"`
+					IDType string `json:"IdType"`
+				} `json:"ArticleId"`
+			} `json:"ArticleIdList"`
+		} `json:"Reference"`
+	} `json:"ReferenceList"`
+}
+
+type MedlineCitationJson struct {
+	Status string `json:"Status"`
+	Owner  string `json:"Owner"`
+	PMID   struct {
+		Text    string `json:"Text"`
+		Version string `json:"Version"`
+	} `json:"PMID"`
+	DateRevised struct {
+		Year  string `json:"Year"`
+		Month string `json:"Month"`
+		Day   string `json:"Day"`
+	} `json:"DateRevised"`
+	Article struct {
+		PubModel string `json:"PubModel"`
+		Journal  struct {
+			ISSN struct {
+				Text     string `json:"Text"`
+				IssnType string `json:"IssnType"`
+			} `json:"ISSN"`
+			JournalIssue struct {
+				CitedMedium string `json:"CitedMedium"`
+				Volume      string `json:"Volume"`
+				Issue       string `json:"Issue"`
+				PubDate     struct {
+					Year  string `json:"Year"`
+					Month string `json:"Month"`
+				} `json:"PubDate"`
+			} `json:"JournalIssue"`
+			Title           string `json:"Title"`
+			ISOAbbreviation string `json:"ISOAbbreviation"`
+		} `json:"Journal"`
+		ArticleTitle struct {
+			Text string   `json:"Text"`
+			I    []string `json:"I"`
+			Sup  string   `json:"Sup"`
+		} `json:"ArticleTitle"`
+		Pagination struct {
+			MedlinePgn string `json:"MedlinePgn"`
+		} `json:"Pagination"`
+		ELocationID struct {
+			Text    string `json:"Text"`
+			EIDType string `json:"EIdType"`
+			ValidYN string `json:"ValidYN"`
+		} `json:"ELocationID"`
+		Abstract struct {
+			AbstractText struct {
+				Text string      `json:"Text"`
+				I    []string    `json:"I"`
+				B    string      `json:"B"`
+				Sub  string      `json:"Sub"`
+				Sup  interface{} `json:"Sup"`
+			} `json:"AbstractText"`
+		} `json:"Abstract"`
+		AuthorList struct {
+			CompleteYN string `json:"CompleteYN"`
+			Author     []struct {
+				ValidYN         string `json:"ValidYN"`
+				LastName        string `json:"LastName"`
+				ForeName        string `json:"ForeName"`
+				Initials        string `json:"Initials"`
+				AffiliationInfo []struct {
+					Affiliation string `json:"Affiliation"`
+				} `json:"AffiliationInfo"`
+				Identifier struct {
+					Text   string `json:"Text"`
+					Source string `json:"Source"`
+				} `json:"Identifier"`
+			} `json:"Author"`
+		} `json:"AuthorList"`
+		Language  string `json:"Language"`
+		GrantList struct {
+			CompleteYN string `json:"CompleteYN"`
+			Grant      []struct {
+				GrantID string `json:"GrantID"`
+				Acronym string `json:"Acronym"`
+				Agency  string `json:"Agency"`
+				Country string `json:"Country"`
+			} `json:"Grant"`
+		} `json:"GrantList"`
+		PublicationTypeList struct {
+			PublicationType []struct {
+				Text string `json:"Text"`
+				UI   string `json:"UI"`
+			} `json:"PublicationType"`
+		} `json:"PublicationTypeList"`
+		ArticleDate struct {
+			DateType string `json:"DateType"`
+			Year     string `json:"Year"`
+			Month    string `json:"Month"`
+			Day      string `json:"Day"`
+		} `json:"ArticleDate"`
+	} `json:"Article"`
+	MedlineJournalInfo struct {
+		Country     string `json:"Country"`
+		MedlineTA   string `json:"MedlineTA"`
+		NlmUniqueID string `json:"NlmUniqueID"`
+		ISSNLinking string `json:"ISSNLinking"`
+	} `json:"MedlineJournalInfo"`
+	CitationSubset string `json:"CitationSubset"`
+	KeywordList    struct {
+		Owner   string `json:"Owner"`
+		Keyword []struct {
+			Text         string `json:"Text"`
+			MajorTopicYN string `json:"MajorTopicYN"`
+		} `json:"Keyword"`
+	} `json:"KeywordList"`
+}

@@ -1,4 +1,4 @@
-package parse
+package extract
 
 import (
 	"strings"
@@ -18,13 +18,13 @@ type SraFields struct {
 	Type         *string
 	SRX          *string
 	SRA          *string
-	SRAFile      *parse.SRAFile
+	SRAFile      *parse.SRAFileJSON
 	Correlation  *map[string]string
 	AbstractURLs *[]string
 	Keywords     *[]string
 }
 
-func GetSimpleSraFields(keywords *[]string, sra *parse.ExperimentPkg, callCor bool, done map[string]int) *SraFields {
+func GetSimpleSraFields(keywords *[]string, sra *parse.ExperimentPkgJSON, callCor bool, done map[string]int) *SraFields {
 	titleAbs := sra.EXPERIMENT.TITLE + "\n" + sra.STUDY.DESCRIPTOR.STUDYTITLE +
 		"\n" + sra.STUDY.DESCRIPTOR.STUDYABSTRACT
 	doc, err := prose.NewDocument(titleAbs)
