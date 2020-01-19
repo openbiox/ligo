@@ -9,7 +9,7 @@ func TestTasks(t *testing.T) {
 		SaveLog: false,
 		TaskID:  "test123",
 		Index:   "1,2,3",
-		Script:  "echo {{index}}",
+		Script:  "echo {{index}} && sleep 200",
 		Thread:  3,
 	}
 	Tasks(&a)

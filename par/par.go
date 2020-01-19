@@ -117,14 +117,14 @@ func Tasks(parClis *ClisT) (err error) {
 	for i := 0; i < len(index2); i++ {
 		var ind = index2[i]
 		sem <- true
-		name := fmt.Sprintf("Task #%d", i+1)
+		name := fmt.Sprintf("Job: #%-3d", i+1)
 		bar := p.AddBar(int64(total), mpb.BarID(i),
 			mpb.BarStyle("╢=>-╟"),
 			// override mpb.DefaultSpinnerStyle
 			mpb.PrependDecorators(
 				// simple name decorator
 				decor.OnComplete(decor.Spinner(nil, decor.WCSyncSpace), "√"),
-				decor.Name(" "+name+fmt.Sprintf(" | index: %5d#", ind)),
+				decor.Name(" "+name+fmt.Sprintf("| index: #%-3d", ind)),
 			),
 			mpb.AppendDecorators(
 				// replace ETA decorator with "done" message, OnComplete event
@@ -148,8 +148,21 @@ func Tasks(parClis *ClisT) (err error) {
 					count++
 					if count == 99 {
 						count = 0
+					} else if count < 10 {
+						time.Sleep(time.Second / 3)
+					} else if count < 20 {
+						time.Sleep(time.Second)
+					} else if count < 30 {
+						time.Sleep(time.Second * 2)
+					} else if count < 50 {
+						time.Sleep(time.Second * 3)
+					} else if count < 70 {
+						time.Sleep(time.Second * 4)
+					} else if count < 80 {
+						time.Sleep(time.Second * 5)
+					} else {
+						time.Sleep(time.Second * 6)
 					}
-					time.Sleep(time.Second / 5)
 				}
 			}(bar)
 			var cmd *exec.Cmd
