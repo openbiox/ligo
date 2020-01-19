@@ -8,6 +8,7 @@ require (
 	github.com/antchfx/xmlquery v1.2.3 // indirect
 	github.com/antchfx/xpath v1.1.4 // indirect
 	github.com/antonfisher/nested-logrus-formatter v1.0.2
+	github.com/deckarep/golang-set v1.7.1 // indirect
 	github.com/dsnet/compress v0.0.1 // indirect
 	github.com/frankban/quicktest v1.7.2 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
@@ -17,6 +18,8 @@ require (
 	github.com/json-iterator/go v1.1.9
 	github.com/kennygrant/sanitize v1.2.4 // indirect
 	github.com/mholt/archiver v3.1.1+incompatible
+	github.com/mingrammer/commonregex v1.0.1 // indirect
+	github.com/neurosnap/sentences v1.0.6 // indirect
 	github.com/nwaples/rardecode v1.0.0 // indirect
 	github.com/pierrec/lz4 v2.4.0+incompatible // indirect
 	github.com/saintfish/chardet v0.0.0-20120816061221-3af4cd4741ca // indirect
@@ -26,5 +29,9 @@ require (
 	github.com/tidwall/pretty v1.0.0
 	github.com/vbauerster/mpb/v4 v4.11.2
 	github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8 // indirect
+	gonum.org/v1/gonum v0.6.2 // indirect
 	google.golang.org/appengine v1.6.5 // indirect
+	gopkg.in/jdkato/prose.v2 v2.0.0-20190814032740-822d591a158c
+	gopkg.in/neurosnap/sentences.v1 v1.0.6 // indirect
+	mvdan.cc/xurls/v2 v2.1.0
 )
