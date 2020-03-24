@@ -39,6 +39,9 @@ func FormatURLfileName(url string, remoteName bool, timeout int, proxy string) (
 	u, _ := neturl.Parse(url)
 	uQ := u.Query()
 	fname = path.Base(url)
+	if strings.Contains(url, "https://pdfs.journals.lww.com") {
+		return path.Base(u.EscapedPath())
+	}
 	// cell.com
 	if stringo.StrDetect(url, "/pdfExtended/|/pdfdirect/|/Article/Pdf/|/content/articlepdf/|/rmp/pdf/") {
 		fname = path.Base(url) + ".pdf"
