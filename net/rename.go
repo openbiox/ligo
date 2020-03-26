@@ -22,7 +22,10 @@ func FormatURLfileName(url string, remoteName bool, timeout int, proxy string) (
 			log.Fatal(err)
 		}
 		defer resp.Body.Close()
-		return resp2Filname(resp)
+		fname = resp2Filname(resp)
+		if fname != "" {
+			return fname
+		}
 	} else if remoteName {
 		client := &http.Client{
 			CheckRedirect: func(req *http.Request, via []*http.Request) error {
@@ -34,7 +37,10 @@ func FormatURLfileName(url string, remoteName bool, timeout int, proxy string) (
 			log.Fatal(err)
 		}
 		defer resp.Body.Close()
-		return resp2Filname(resp)
+		fname = resp2Filname(resp)
+		if fname != "" {
+			return fname
+		}
 	}
 	u, _ := neturl.Parse(url)
 	uQ := u.Query()
