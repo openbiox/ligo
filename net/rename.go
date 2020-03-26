@@ -59,8 +59,8 @@ func FormatURLfileName(url string, remoteName bool, timeout int, proxy string) (
 		fname = strings.ReplaceAll(path.Base(url), "&type=printable", "") + ".pdf"
 	} else if fname == "pdf" {
 		fname = path.Base(strings.ReplaceAll(url, "/pdf", ".pdf"))
-	} else if stringo.StrDetect(fname, "[?]Expires=") {
-		fname = stringo.StrReplaceAll(fname, "[?]Expires=.*", "")
+	} else if stringo.StrDetect(fname, "[?][eE]xpires=") {
+		fname = stringo.StrReplaceAll(fname, "[?][eE]xpires=.*", "")
 	} else if stringo.StrDetect(url, "/action/downloadSupplement[?].*") {
 		fname = stringo.StrReplaceAll(fname, "downloadSupplement.*file=", "")
 	} else if stringo.StrDetect(url, "(.com/doi/pdf/)|(.org/doi/pdf/)|(.org/doi/pdfdirect/)") {
