@@ -19,13 +19,14 @@ func FormatURLfileName(url string, remoteName bool, timeout int, proxy string) (
 		req, err := http.NewRequest("GET", url, nil)
 		resp, err := client.Do(req)
 		if err != nil {
-			log.Fatal(err)
-		}
-		defer resp.Body.Close()
-		fname = resp2Filname(resp)
-		if fname != "" {
-			return fname
-		}
+			log.Warnln(err)
+		} else {
+		    defer resp.Body.Close()
+		    fname = resp2Filname(resp)
+		    if fname != "" {
+		        return fname
+		    }
+        }
 	} else if remoteName {
 		client := &http.Client{
 			CheckRedirect: func(req *http.Request, via []*http.Request) error {
@@ -34,13 +35,14 @@ func FormatURLfileName(url string, remoteName bool, timeout int, proxy string) (
 		}
 		resp, err := client.Head(url)
 		if err != nil {
-			log.Fatal(err)
-		}
-		defer resp.Body.Close()
-		fname = resp2Filname(resp)
-		if fname != "" {
-			return fname
-		}
+			log.Warnln(err)
+		} else {
+		    defer resp.Body.Close()
+		    fname = resp2Filname(resp)
+		    if fname != "" {
+			    return fname
+		    }
+        }
 	}
 	u, _ := neturl.Parse(url)
 	uQ := u.Query()

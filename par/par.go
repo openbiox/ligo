@@ -95,7 +95,7 @@ func Tasks(parClis *ClisT) (err error) {
 	logSlice := []string{}
 	for i := range index2 {
 		if parClis.SaveLog {
-			logSlice = append(logSlice, fmt.Sprintf("%s-%d.log", logPrefix, i+1))
+			logSlice = append(logSlice, fmt.Sprintf("%s-%d.log", logPrefix, index2[i]))
 		} else {
 			logSlice = append(logSlice, "")
 		}
