@@ -11,11 +11,15 @@ import (
 
 // RetriesClient http.Client and requenst with retries
 func RetriesClient(client *http.Client, req *http.Request, opt *Params) (resp *http.Response, err error) {
-	for t := 0; t < opt.Retries; t++ {
+	for t := 0; t < opt.Retries+1; t++ {
 		resp, err = client.Do(req)
 		if err != nil {
-			log.Warnf("Failed to retrieve on attempt %d... error: %v ... retrying after %d seconds.", t+1, err, opt.RetSleepTime)
-			time.Sleep(time.Duration(opt.RetSleepTime) * time.Second)
+			if opt.Retries != 0 {
+				log.Warnf("Failed to retrieve on attempt %d... error: %v ... retrying after %d seconds.", t+1, err, opt.RetSleepTime)
+				time.Sleep(time.Duration(opt.RetSleepTime) * time.Second)
+			} else {
+				log.Warnf("Failed to retrieve on attempt %d... error: %v", t+1, err)
+			}
 			continue
 		} else if err2 := checkResp(resp); err2 != nil {
 			return nil, err2
@@ -31,15 +35,20 @@ func RetriesURL(url string, cmd *exec.Cmd, logPath string, opt *Params) (err err
 	var t int
 	success := false
 	var cmdRun exec.Cmd
-	for t = 0; t < opt.Retries; t++ {
+	for t = 0; t < opt.Retries+1; t++ {
 		cmdRun = *cmd
 		err := bexec.System(&cmdRun, logPath, opt.Quiet)
 		if err == nil {
 			success = true
 			break
 		} else {
-			log.Warnf("Failed to retrive on attempt %d... error: %v ... retrying after %d seconds.", t+1, err, opt.RetSleepTime)
-			time.Sleep(time.Duration(opt.RetSleepTime) * time.Second)
+			if opt.Retries != 0 {
+				log.Warnf("Failed to retrive on attempt %d... error: %v ... retrying after %d seconds.", t+1, err, opt.RetSleepTime)
+				time.Sleep(time.Duration(opt.RetSleepTime) * time.Second)
+			} else {
+				log.Warnf("Failed to retrieve on attempt %d... error: %v", t+1, err)
+			}
+			continue
 		}
 	}
 	if !success {
@@ -53,14 +62,18 @@ func RetriesTask(taskName string, cmd *exec.Cmd, logPath string, opt *Params) (e
 	var t int
 	success := false
 	var cmdRun exec.Cmd
-	for t = 0; t < opt.Retries; t++ {
+	for t = 0; t < opt.Retries+1; t++ {
 		cmdRun = *cmd
 		err := bexec.System(&cmdRun, logPath, opt.Quiet)
 		if err == nil {
 			success = true
 			break
 		} else {
-			log.Warnf("Failed on attempt %d... error: %v ... retrying after %d seconds.", t+1, err, opt.RetSleepTime)
+			if opt.Retries != 0 {
+				log.Warnf("Failed on attempt %d... error: %v ... retrying after %d seconds.", t+1, err, opt.RetSleepTime)
+			} else {
+				log.Warnf("Failed on attempt %d... error: %v", t+1, err)
+			}
 			time.Sleep(time.Duration(opt.RetSleepTime) * time.Second)
 		}
 	}
