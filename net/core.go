@@ -14,6 +14,7 @@ import (
 	"time"
 
 	cio "github.com/openbiox/ligo/io"
+	"github.com/openbiox/ligo/net/hget"
 )
 
 // HTTPGetURLs can use golang http.Get and external commandline tools including wget, curl, axel, git and rsync
@@ -21,7 +22,7 @@ import (
 func HTTPGetURLs(urls []string, destDir []string, opt *Params) (destFns []string) {
 	sem := make(chan bool, opt.Thread)
 	newOpt := *opt
-	if len(urls) > 1 && opt.Thread > 1 && opt.Engine != "go-http" {
+	if len(urls) > 1 && opt.Thread > 1 && opt.Engine != "simplego" && opt.Engine != "default" {
 		newOpt.Quiet = true
 	}
 	wg := sync.WaitGroup{}
@@ -170,6 +171,7 @@ func AsyncURL(url string, destFn string, opt *Params) error {
 	} else if engine == "hg" {
 		return Hg(url, destFn, opt)
 	}
+	log.Infof("Not found valid download engine name.")
 	return nil
 }
 
@@ -183,7 +185,7 @@ func AsyncURL2(url string, destFn string, opt *Params) error {
 	} else if gitEngine == "hg" {
 		engine = "hg"
 	}
-	if engine == "go-http" {
+	if engine == "simplego" {
 		if opt.Mirror != "" {
 			if !strings.HasSuffix(opt.Mirror, "/") {
 				opt.Mirror = opt.Mirror + "/"
@@ -191,9 +193,17 @@ func AsyncURL2(url string, destFn string, opt *Params) error {
 			url = opt.Mirror + filepath.Base(url)
 		}
 		return HTTPGetURL(url, destFn, opt)
-	} else {
-		return AsyncURL(url, destFn, opt)
+	} else if engine == "default" {
+		mode := ""
+		stateDir := path.Join(os.Getenv("HOME"), ".config/bget/data", filepath.Base(destFn))
+		hasDest, _ := cio.PathExists(destFn)
+		hasState, _ := cio.PathExists(stateDir)
+		if hasDest || hasState {
+			mode = "resume"
+		}
+		return hget.Pull(url, destFn, !opt.Quiet, opt.ThreadQuery, mode, opt.Timeout, opt.Proxy, opt.Pbar)
 	}
+	return AsyncURL(url, destFn, opt)
 }
 
 // AsyncURL3 can access URL via using golang http library (with mbp progress bar) and
@@ -206,7 +216,7 @@ func AsyncURL3(url string, destFn string, opt *Params) (err error) {
 	} else if gitEngine == "hg" {
 		engine = "hg"
 	}
-	if engine == "go-http" {
+	if engine == "simplego" {
 		if opt.Mirror != "" {
 			if !strings.HasSuffix(opt.Mirror, "/") {
 				opt.Mirror = opt.Mirror + "/"

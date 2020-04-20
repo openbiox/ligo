@@ -13,7 +13,7 @@ go get -u github.com/openbiox/ligo/...
 ## Usage
 
 ```golang
-package main
+package hget
 
 import (
 	"fmt"

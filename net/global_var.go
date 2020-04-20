@@ -20,7 +20,7 @@ type Params struct {
 	EgaCredentials string
 	Mirror         string
 	Thread         int
-	AxelThread     int
+	ThreadQuery    int
 	ExtraArgs      string
 	Proxy          string
 	TaskID         string

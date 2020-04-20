@@ -82,7 +82,7 @@ func Curl(url string, destFn string, opt *Params) (err error) {
 func setAxelCmd(url string, destFn string, opt *Params) *exec.Cmd {
 	cmdCheck := exec.Command("sh", "-c", `axel --help | grep '\--timeout'`)
 	isNewAxel, _ := cmdCheck.CombinedOutput()
-	args := []string{url, "-o", destFn, "-n", strconv.Itoa(opt.AxelThread)}
+	args := []string{url, "-o", destFn, "-n", strconv.Itoa(opt.ThreadQuery)}
 	if string(isNewAxel) != "" {
 		args = append(args, []string{"--timeout=" + strconv.Itoa(opt.Timeout)}...)
 	}
