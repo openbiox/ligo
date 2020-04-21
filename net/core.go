@@ -139,7 +139,13 @@ func HTTPGetURL(url string, destFn string, opt *Params) error {
 			success = true
 			break
 		} else {
-			log.Warnf("Failed to retrive on attempt %d... error: %v ... retrying after %d seconds.", t+1, err, opt.RetSleepTime)
+			filler := makeLogBar(fmt.Sprintf("Failed to retrive on attempt %d...", t+1))
+			opt.Pbar.Add(0, filler).SetTotal(0, true)
+			filler = makeLogBar(fmt.Sprintf("error: %v", err))
+			opt.Pbar.Add(0, filler).SetTotal(0, true)
+			filler = makeLogBar(fmt.Sprintf("retrying after %d seconds.", opt.RetSleepTime))
+			opt.Pbar.Add(0, filler).SetTotal(0, true)
+
 			time.Sleep(time.Duration(opt.RetSleepTime) * time.Second)
 		}
 	}
@@ -216,16 +222,45 @@ func AsyncURL2(url string, destFn string, opt *Params) error {
 		}
 		return HTTPGetURL(url, destFn, opt)
 	} else if engine == "default" {
-		mode := ""
-		stateDir := path.Join(os.Getenv("HOME"), ".config/bget/data", filepath.Base(destFn))
-		hasDest, _ := cio.PathExists(destFn)
-		hasState, _ := cio.PathExists(stateDir)
-		if hasDest || hasState {
-			mode = "resume"
-		}
-		return hget.Pull(url, destFn, !opt.Quiet, opt.ThreadQuery, mode, opt.Timeout, opt.Proxy, opt.Pbar)
+		return hgetRetry(url, destFn, opt)
 	}
 	return AsyncURL(url, destFn, opt)
+}
+
+func hgetRetry(url string, destFn string, opt *Params) (err error) {
+	mode := ""
+	stateDir := path.Join(os.Getenv("HOME"), ".config/bget/data", filepath.Base(destFn))
+	hasDest, _ := cio.PathExists(destFn)
+	hasState, _ := cio.PathExists(stateDir)
+	if hasState {
+		mode = "resume"
+	} else if hasDest && !opt.Overwrite {
+		log.Infof("%s done.", destFn)
+		return nil
+	}
+
+	var t int
+	var success = false
+	for t = 0; t < opt.Retries; t++ {
+		err = hget.Pull(url, destFn, !opt.Quiet, opt.ThreadQuery, mode, opt.Timeout, opt.Proxy, opt.Pbar)
+		if err == nil {
+			success = true
+			break
+		} else {
+			filler := makeLogBar(fmt.Sprintf("Failed to retrive on attempt %d...", t+1))
+			opt.Pbar.Add(0, filler).SetTotal(0, true)
+			filler = makeLogBar(fmt.Sprintf("error: %v", err))
+			opt.Pbar.Add(0, filler).SetTotal(0, true)
+			filler = makeLogBar(fmt.Sprintf("retrying after %d seconds.", opt.RetSleepTime))
+			opt.Pbar.Add(0, filler).SetTotal(0, true)
+
+			time.Sleep(time.Duration(opt.RetSleepTime) * time.Second)
+		}
+	}
+	if !success {
+		return err
+	}
+	return nil
 }
 
 // AsyncURL3 can access URL via using golang http library (with mbp progress bar) and
@@ -254,9 +289,8 @@ func AsyncURL3(url string, destFn string, opt *Params) (err error) {
 }
 
 func makeLogBar(msg string) mpb.BarFiller {
-	limit := "%%.%ds"
 	return mpb.BarFillerFunc(func(w io.Writer, width int, st *decor.Statistics) {
-		fmt.Fprintf(w, fmt.Sprintf(limit, width), msg)
+		fmt.Fprintf(w, msg)
 	})
 }
 

@@ -17,7 +17,6 @@ import (
 var log = clog.Logger
 var displayProgress = true
 var pbg *mpb.Progress
-var msgDone = false
 
 var (
 	tr = &http.Transport{
@@ -51,12 +50,12 @@ func Pull(taskname string, dest string, pg bool, thread int, mode string, timeou
 		state, err := Resume(task)
 		if err != nil && err.Error() == "state not existed" {
 			os.RemoveAll(FolderOf(taskname))
-			Execute(taskname, nil, conn, skiptls, dest)
-			return nil
+			err = Execute(taskname, nil, conn, skiptls, dest)
+			return err
 		}
-		Execute(state.Url, state, conn, skiptls, dest)
+		err = Execute(state.Url, state, conn, skiptls, dest)
 	} else {
-		Execute(taskname, nil, conn, skiptls, dest)
+		err = Execute(taskname, nil, conn, skiptls, dest)
 	}
 	return err
 }
@@ -85,7 +84,10 @@ func Execute(url string, state *State, conn int, skiptls bool, dest string) (err
 
 	var downloader *HttpDownloader
 	if state == nil {
-		downloader = NewHttpDownloader(url, conn, skiptls, dest)
+		downloader, err = NewHttpDownloader(url, conn, skiptls, dest)
+		if err != nil {
+			return err
+		}
 	} else {
 		downloader = &HttpDownloader{url: state.Url, file: dest, par: int64(len(state.Parts)), parts: state.Parts, resumable: true}
 	}
@@ -106,9 +108,8 @@ func Execute(url string, state *State, conn int, skiptls bool, dest string) (err
 		case file := <-fileChan:
 			files = append(files, file)
 		case err := <-errorChan:
-			for i := range bars {
-				bars[i].Abort(false)
-			}
+			filler := makeLogBar(err.Error())
+			pbg.Add(0, filler).SetTotal(0, true)
 			return err
 		case part := <-stateChan:
 			parts = append(parts, part)
@@ -119,16 +120,14 @@ func Execute(url string, state *State, conn int, skiptls bool, dest string) (err
 						bars[i].Abort(false)
 					}
 					filler := makeLogBar(fmt.Sprintf("Interrupted, saving state ..."))
-					if !msgDone {
-						pbg.Add(0, filler).SetTotal(0, true)
-						msgDone = true
-					}
+					pbg.Add(0, filler).SetTotal(0, true)
 					s := &State{Url: url, Parts: parts}
 					err = s.Save()
 					if err != nil {
-						log.Warnln(err)
+						filler := makeLogBar(err.Error())
+						pbg.Add(0, filler).SetTotal(0, true)
 					}
-					return
+					return err
 				} else {
 					for i := range bars {
 						bars[i].Abort(false)
@@ -136,12 +135,15 @@ func Execute(url string, state *State, conn int, skiptls bool, dest string) (err
 					filler := makeLogBar(fmt.Sprintf("Interrupted, but downloading url is not resumable, silently die"))
 					pbg.Add(0, filler).SetTotal(0, true)
 					os.RemoveAll(FolderOf(url))
-					return
+					return nil
 				}
 			} else {
-				JoinFile(files, dest)
+				err := JoinFile(files, dest)
+				if err != nil {
+					return err
+				}
 				os.RemoveAll(FolderOf(url))
-				return
+				return nil
 			}
 		}
 	}

@@ -9,18 +9,20 @@ import (
 )
 
 func TestHttpGetURLs(t *testing.T) {
-	urls := []string{"http://www.openbioinformatics.org/annovar/download/hg19_clinvar_20150330.txt.gz", "http://www.openbioinformatics.org/annovar/download/hg19_clinvar_20170130.txt.gz",
-		"http://www.openbioinformatics.org/annovar/download/hg19_clinvar_20180603.txt.gz"}
+	//urls := []string{"https://dldir1.qq.com/qqfile/qq/PCQQ9.1.6/25786/QQ9.1.6.25786.exe",
+	//	"https://dldir1.qq.com/weixin/Windows/WeChatSetup.exe"}
+	urls := []string{"http://61.129.70.139:3030/api/viewfile/?path=/tmp/hiplot-It8jqd/a7yqy740q78.tar"}
 	destDir := []string{os.TempDir(), os.TempDir(), os.TempDir()}
 	param := &Params{}
 	param.Retries = 5
 	param.Engine = "default"
 	param.Timeout = 35
-	param.Overwrite = false
+	param.Overwrite = true
 	param.Ignore = true
 	param.TaskID = "test"
+	param.RetSleepTime = 2
 	param.Thread = 2
-	param.ThreadQuery = 3
+	param.ThreadQuery = 10
 	param.LogDir = os.TempDir()
 	param.Pbar = mpb.New(
 		mpb.WithWidth(45),

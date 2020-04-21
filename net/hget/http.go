@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"sync"
 	"unicode/utf8"
 
@@ -32,18 +33,26 @@ type HttpDownloader struct {
 	resumable bool
 }
 
-func NewHttpDownloader(url string, par int, skipTls bool, dest string) *HttpDownloader {
+func NewHttpDownloader(url string, par int, skipTls bool, dest string) (*HttpDownloader, error) {
 	var resumable = true
+	if !strings.Contains(url, "://") {
+		url = "http://" + url
+	}
 	parsed, _ := stdurl.Parse(url)
 
 	ips, err := net.LookupIP(parsed.Host)
 
 	ipstr := FilterIPV4(ips)
 	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
 
 	gCurCookies = gCurCookieJar.Cookies(req.URL)
 	resp, err := client.Do(req)
-
+	if err != nil {
+		return nil, err
+	}
 	if resp.Header.Get(acceptRangeHeader) == "" {
 		//fallback to par = 1
 		par = 1
@@ -71,7 +80,7 @@ func NewHttpDownloader(url string, par int, skipTls bool, dest string) *HttpDown
 	ret.parts = partCalculate(int64(par), len, url)
 	ret.resumable = resumable
 
-	return ret
+	return ret, nil
 }
 
 func partCalculate(par int64, len int64, url string) []Part {
@@ -107,18 +116,16 @@ func (d *HttpDownloader) Do(doneChan chan bool, fileChan chan string, errorChan 
 		for i, part := range d.parts {
 			prefixStr := filepath.Base(d.file)
 			prefixStrLen := utf8.RuneCountInString(prefixStr)
-			if prefixStrLen >= 21 {
-				prefixStr = prefixStr[0:19] + "..."
-				prefixStr = fmt.Sprintf("%-22s", prefixStr)
-				prefixStr = fmt.Sprintf("%s-%d\t", prefixStr, i)
+			if prefixStrLen >= 18 {
+				prefixStr = fmt.Sprintf("%-22s\t", fmt.Sprintf("%s..-%d", prefixStr[0:17], i))
 			} else {
-				prefixStr = fmt.Sprintf("%-24s\t", fmt.Sprintf("%s-%d ", prefixStr, i))
+				prefixStr = fmt.Sprintf("%-22s\t", fmt.Sprintf("%s-%d", prefixStr, i))
 			}
 			size := part.RangeTo - part.RangeFrom
-			if size < 0 {
-				size = 0
+			if !d.resumable {
+				size = -1
 			}
-			newbar := pbg.AddBar(part.RangeTo-part.RangeFrom,
+			newbar := pbg.AddBar(size,
 				mpb.BarNoPop(),
 				mpb.BarStyle("[=>-|"),
 				mpb.PrependDecorators(
@@ -155,8 +162,9 @@ func (d *HttpDownloader) Do(doneChan chan bool, fileChan chan string, errorChan 
 
 			//send request
 			req, err := http.NewRequest("GET", d.url, nil)
+			req.Header.Set("Connection", "keep-alive")
+			req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36")
 			if err != nil {
-				bar.Abort(true)
 				errorChan <- err
 				return
 			}
@@ -164,7 +172,6 @@ func (d *HttpDownloader) Do(doneChan chan bool, fileChan chan string, errorChan 
 			if d.par > 1 { //support range download just in case parallel factor is over 1
 				req.Header.Add("Range", ranges)
 				if err != nil {
-					bar.Abort(true)
 					errorChan <- err
 					return
 				}
@@ -187,7 +194,7 @@ func (d *HttpDownloader) Do(doneChan chan bool, fileChan chan string, errorChan 
 			}
 
 			var writer io.Writer
-			writer = io.MultiWriter(f)
+			writer = io.Writer(f)
 
 			//make copy interruptable by copy 100 bytes each loop
 			current := int64(0)
@@ -203,12 +210,11 @@ func (d *HttpDownloader) Do(doneChan chan bool, fileChan chan string, errorChan 
 						reader := bar.ProxyReader(resp.Body)
 						written, err = io.CopyN(writer, reader, 100)
 					} else {
-						written, err = io.CopyN(writer, resp.Body, 100)
+						written, err = io.CopyN(writer, io.Reader(resp.Body), 100)
 					}
 					current += written
 					if err != nil {
 						if err != io.EOF && DisplayProgressBar() {
-							bar.Abort(false)
 							errorChan <- err
 						} else if err != io.EOF {
 							errorChan <- err
