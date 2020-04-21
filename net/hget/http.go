@@ -12,8 +12,8 @@ import (
 	"sync"
 	"unicode/utf8"
 
-	mpb "github.com/vbauerster/mpb/v4"
-	"github.com/vbauerster/mpb/v4/decor"
+	mpb "github.com/vbauerster/mpb/v5"
+	"github.com/vbauerster/mpb/v5/decor"
 )
 
 var (
@@ -107,18 +107,19 @@ func (d *HttpDownloader) Do(doneChan chan bool, fileChan chan string, errorChan 
 		for i, part := range d.parts {
 			prefixStr := filepath.Base(d.file)
 			prefixStrLen := utf8.RuneCountInString(prefixStr)
-			if prefixStrLen >= 18 {
-				prefixStr = prefixStr[0:17] + "..."
-				prefixStr = fmt.Sprintf("%-18s", prefixStr)
-				prefixStr = fmt.Sprintf("%s-%d ", prefixStr, i)
+			if prefixStrLen >= 21 {
+				prefixStr = prefixStr[0:19] + "..."
+				prefixStr = fmt.Sprintf("%-22s", prefixStr)
+				prefixStr = fmt.Sprintf("%s-%d\t", prefixStr, i)
 			} else {
-				prefixStr = fmt.Sprintf("%-20s", fmt.Sprintf("%s-%d ", prefixStr, i))
+				prefixStr = fmt.Sprintf("%-24s\t", fmt.Sprintf("%s-%d ", prefixStr, i))
 			}
 			size := part.RangeTo - part.RangeFrom
 			if size < 0 {
 				size = 0
 			}
 			newbar := pbg.AddBar(part.RangeTo-part.RangeFrom,
+				mpb.BarNoPop(),
 				mpb.BarStyle("[=>-|"),
 				mpb.PrependDecorators(
 					decor.Name(prefixStr, decor.WC{W: len(prefixStr) + 1, C: decor.DidentRight}),

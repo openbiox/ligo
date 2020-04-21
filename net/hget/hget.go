@@ -2,18 +2,22 @@ package hget
 
 import (
 	"crypto/tls"
+	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
 	clog "github.com/openbiox/ligo/log"
-	mpb "github.com/vbauerster/mpb/v4"
+	mpb "github.com/vbauerster/mpb/v5"
+	"github.com/vbauerster/mpb/v5/decor"
 )
 
 var log = clog.Logger
 var displayProgress = true
 var pbg *mpb.Progress
+var msgDone = false
 
 var (
 	tr = &http.Transport{
@@ -45,8 +49,10 @@ func Pull(taskname string, dest string, pg bool, thread int, mode string, timeou
 			task = taskname
 		}
 		state, err := Resume(task)
-		if err != nil {
-			return err
+		if err != nil && err.Error() == "state not existed" {
+			os.RemoveAll(FolderOf(taskname))
+			Execute(taskname, nil, conn, skiptls, dest)
+			return nil
 		}
 		Execute(state.Url, state, conn, skiptls, dest)
 	} else {
@@ -112,7 +118,11 @@ func Execute(url string, state *State, conn int, skiptls bool, dest string) (err
 					for i := range bars {
 						bars[i].Abort(false)
 					}
-					log.Infof("Interrupted, saving state ...")
+					filler := makeLogBar(fmt.Sprintf("Interrupted, saving state ..."))
+					if !msgDone {
+						pbg.Add(0, filler).SetTotal(0, true)
+						msgDone = true
+					}
 					s := &State{Url: url, Parts: parts}
 					err = s.Save()
 					if err != nil {
@@ -123,7 +133,8 @@ func Execute(url string, state *State, conn int, skiptls bool, dest string) (err
 					for i := range bars {
 						bars[i].Abort(false)
 					}
-					log.Warnln("Interrupted, but downloading url is not resumable, silently die")
+					filler := makeLogBar(fmt.Sprintf("Interrupted, but downloading url is not resumable, silently die"))
+					pbg.Add(0, filler).SetTotal(0, true)
 					os.RemoveAll(FolderOf(url))
 					return
 				}
@@ -134,4 +145,10 @@ func Execute(url string, state *State, conn int, skiptls bool, dest string) (err
 			}
 		}
 	}
+}
+
+func makeLogBar(msg string) mpb.BarFiller {
+	return mpb.BarFillerFunc(func(w io.Writer, width int, st *decor.Statistics) {
+		fmt.Fprintf(w, msg)
+	})
 }

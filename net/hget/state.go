@@ -2,6 +2,8 @@ package hget
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path"
@@ -29,7 +31,6 @@ func (s *State) Save() error {
 	//make temp folder
 	//only working in unix with env HOME
 	folder := FolderOf(s.Url)
-	log.Infof("Saving current download data in %s.", folder)
 	if err := MkdirIfNotExist(folder); err != nil {
 		return err
 	}
@@ -50,9 +51,12 @@ func (s *State) Save() error {
 func Read(task string) (*State, error) {
 	file := filepath.Join(os.Getenv("HOME"), dataFolder, task, stateFileName)
 	if hasStateFile, _ := cio.PathExists(file); hasStateFile {
-		log.Infof("Getting state data from %s.", file)
+		filler := makeLogBar(fmt.Sprintf("Getting state data from %s.", file))
+		pbg.Add(0, filler).SetTotal(0, true)
 	} else {
-		log.Infof("%s done.", path.Base(path.Dir(file)))
+		filler := makeLogBar(fmt.Sprintf("State file of %s not existed.", path.Base(path.Dir(file))))
+		pbg.Add(0, filler).SetTotal(0, true)
+		return nil, errors.New("state not existed")
 	}
 	bytes, err := ioutil.ReadFile(file)
 	if err != nil {

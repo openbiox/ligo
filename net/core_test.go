@@ -5,12 +5,12 @@ import (
 	"testing"
 	"time"
 
-	mpb "github.com/vbauerster/mpb/v4"
+	mpb "github.com/vbauerster/mpb/v5"
 )
 
 func TestHttpGetURLs(t *testing.T) {
-	urls := []string{"https://dldir1.qq.com/weixin/Windows/WeChatSetup.exe",
-		"https://dldir1.qq.com/qqfile/qq/PCQQ9.1.6/25786/QQ9.1.6.25786.exe"}
+	urls := []string{"http://www.openbioinformatics.org/annovar/download/hg19_clinvar_20150330.txt.gz", "http://www.openbioinformatics.org/annovar/download/hg19_clinvar_20170130.txt.gz",
+		"http://www.openbioinformatics.org/annovar/download/hg19_clinvar_20180603.txt.gz"}
 	destDir := []string{os.TempDir(), os.TempDir(), os.TempDir()}
 	param := &Params{}
 	param.Retries = 5
@@ -20,7 +20,7 @@ func TestHttpGetURLs(t *testing.T) {
 	param.Ignore = true
 	param.TaskID = "test"
 	param.Thread = 2
-	param.ThreadQuery = 4
+	param.ThreadQuery = 3
 	param.LogDir = os.TempDir()
 	param.Pbar = mpb.New(
 		mpb.WithWidth(45),

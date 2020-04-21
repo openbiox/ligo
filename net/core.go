@@ -2,19 +2,25 @@ package net
 
 import (
 	"crypto/tls"
+	"fmt"
+	"io"
 	"mime"
 	"net"
 	"net/http"
 	"net/http/cookiejar"
 	"os"
+	"os/signal"
 	"path"
 	"path/filepath"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
 
 	cio "github.com/openbiox/ligo/io"
 	"github.com/openbiox/ligo/net/hget"
+	mpb "github.com/vbauerster/mpb/v5"
+	"github.com/vbauerster/mpb/v5/decor"
 )
 
 // HTTPGetURLs can use golang http.Get and external commandline tools including wget, curl, axel, git and rsync
@@ -43,6 +49,12 @@ func HTTPGetURLs(urls []string, destDir []string, opt *Params) (destFns []string
 	for k, v := range destMap {
 		log.Infof("Trying %s => %s", k, v)
 	}
+	signalChan := make(chan os.Signal, 1)
+	signal.Notify(signalChan,
+		syscall.SIGHUP,
+		syscall.SIGINT,
+		syscall.SIGTERM,
+		syscall.SIGQUIT)
 	for j := range urls {
 		cio.CreateDir(destDir[j])
 		destFn := destMap[urls[j]]
@@ -55,15 +67,25 @@ func HTTPGetURLs(urls []string, destDir []string, opt *Params) (destFns []string
 		if hasDestFn, _ := cio.PathExists(destFn); !hasDestFn || newOpt.Ignore {
 			url := urls[j]
 			sem <- true
-			go func(url string, destFn string) {
+			go func(url string, destFn string, signalChan chan os.Signal) {
 				defer func() {
-					<-sem
+					select {
+					case <-signalChan:
+						//send par number of interrupt for each routine
+						time.Sleep(3 * time.Second)
+						filler := makeLogBar(fmt.Sprintf("Existing ..."))
+						newOpt.Pbar.Add(0, filler).SetTotal(0, true)
+						os.Exit(130)
+						return
+					case <-sem:
+						return
+					}
 				}()
 				err := AsyncURL2(url, destFn, &newOpt)
 				if err == nil {
 					destFns = append(destFns, destFn)
 				}
-			}(url, destFn)
+			}(url, destFn, signalChan)
 		} else {
 			destFns = append(destFns, destFn)
 			log.Infof("%s existed.", destFn)
@@ -229,6 +251,13 @@ func AsyncURL3(url string, destFn string, opt *Params) (err error) {
 		err = AsyncURL(url, destFn, opt)
 	}
 	return nil
+}
+
+func makeLogBar(msg string) mpb.BarFiller {
+	limit := "%%.%ds"
+	return mpb.BarFillerFunc(func(w io.Writer, width int, st *decor.Statistics) {
+		fmt.Fprintf(w, fmt.Sprintf(limit, width), msg)
+	})
 }
 
 func init() {

@@ -19,8 +19,8 @@ import (
 	cio "github.com/openbiox/ligo/io"
 	clog "github.com/openbiox/ligo/log"
 	"github.com/openbiox/ligo/stringo"
-	"github.com/vbauerster/mpb/v4"
-	"github.com/vbauerster/mpb/v4/decor"
+	"github.com/vbauerster/mpb/v5"
+	"github.com/vbauerster/mpb/v5/decor"
 )
 
 var wg sync.WaitGroup
@@ -118,7 +118,9 @@ func Tasks(parClis *ClisT) (err error) {
 		var ind = index2[i]
 		sem <- true
 		name := fmt.Sprintf("Job: #%-3d", i+1)
-		bar := p.AddBar(int64(total), mpb.BarID(i),
+		bar := p.AddBar(int64(total),
+			mpb.BarNoPop(),
+			mpb.BarID(i),
 			mpb.BarStyle("╢=>-╟"),
 			// override mpb.DefaultSpinnerStyle
 			mpb.PrependDecorators(

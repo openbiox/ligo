@@ -13,8 +13,8 @@ import (
 
 	cio "github.com/openbiox/ligo/io"
 	"github.com/openbiox/ligo/stringo"
-	mpb "github.com/vbauerster/mpb/v4"
-	"github.com/vbauerster/mpb/v4/decor"
+	mpb "github.com/vbauerster/mpb/v5"
+	"github.com/vbauerster/mpb/v5/decor"
 )
 
 func checkHTTPGetURLRdirect(resp *http.Response, url string, destFn string, opt *Params) (status bool) {
@@ -108,6 +108,7 @@ func downloadWorker(client *http.Client, req *http.Request, url string, destFn s
 	prefixStr = fmt.Sprintf("%-18s\t", prefixStr)
 	if !opt.Quiet {
 		bar := opt.Pbar.AddBar(size,
+			mpb.BarNoPop(),
 			mpb.BarStyle("[=>-|"),
 			mpb.PrependDecorators(
 				decor.Name(prefixStr, decor.WC{W: len(prefixStr) + 1, C: decor.DidentRight}),

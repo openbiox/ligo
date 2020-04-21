@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	clog "github.com/openbiox/ligo/log"
-	mpb "github.com/vbauerster/mpb/v4"
+	mpb "github.com/vbauerster/mpb/v5"
 )
 
 var gCurCookies []*http.Cookie
