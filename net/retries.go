@@ -43,6 +43,9 @@ func RetriesURL(url string, cmd *exec.Cmd, logPath string, opt *Params) (err err
 			break
 		} else {
 			if opt.Retries != 0 {
+				if err.Error() == "signal: interrupt" {
+					break
+				}
 				log.Warnf("Failed to retrive on attempt %d... error: %v ... retrying after %d seconds.", t+1, err, opt.RetSleepTime)
 				time.Sleep(time.Duration(opt.RetSleepTime) * time.Second)
 			} else {

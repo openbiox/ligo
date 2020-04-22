@@ -9,13 +9,14 @@ import (
 )
 
 func TestHttpGetURLs(t *testing.T) {
-	urls := []string{"https://dldir1.qq.com/qqfile/qq/PCQQ9.1.6/25786/QQ9.1.6.25786.exe",
-		"https://dldir1.qq.com/weixin/Windows/WeChatSetup.exe"}
+	// urls := []string{"https://dldir1.qq.com/qqfile/qq/PCQQ9.1.6/25786/QQ9.1.6.25786.exe",
+	//	"https://dldir1.qq.com/weixin/Windows/WeChatSetup.exe"}
 	//urls := []string{"http://61.129.70.139:3030/api/viewfile/?path=/tmp/hiplot-It8jqd/a7yqy740q78.tar"}
+	urls := []string{"https://github.com/openanno/bget"}
 	destDir := []string{os.TempDir(), os.TempDir(), os.TempDir()}
 	param := &Params{}
 	param.Retries = 5
-	param.Engine = "default"
+	param.Engine = "git"
 	param.Timeout = 35
 	param.Overwrite = true
 	param.Ignore = true
