@@ -108,7 +108,7 @@ func partCalculate(par int64, len int64, url string) []Part {
 	return ret
 }
 
-func (d *HttpDownloader) Do(doneChan chan bool, fileChan chan string, errorChan chan error, interruptChan chan bool, stateSaveChan chan Part, bars []*mpb.Bar) {
+func (d *HttpDownloader) Do(doneChan chan bool, fileChan chan string, errorChan chan error, interruptChan chan bool, stateSaveChan chan Part, bars []*mpb.Bar, pbg *mpb.Progress) {
 
 	var ws sync.WaitGroup
 

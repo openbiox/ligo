@@ -16,7 +16,6 @@ import (
 
 var log = clog.Logger
 var displayProgress = true
-var pbg *mpb.Progress
 
 var (
 	tr = &http.Transport{
@@ -25,10 +24,8 @@ var (
 	client = &http.Client{Transport: tr}
 )
 
-func Pull(taskname string, dest string, pg bool, thread int, mode string, timeout int, proxy string, p *mpb.Progress) (err error) {
-	if pbg == nil {
-		pbg = p
-	}
+func Pull(taskname string, dest string, pg bool, thread int, mode string, timeout int, proxy string, pbg *mpb.Progress) (err error) {
+
 	client = NewHTTPClient(timeout, proxy)
 	if !pg {
 		displayProgress = false
@@ -47,20 +44,20 @@ func Pull(taskname string, dest string, pg bool, thread int, mode string, timeou
 		} else {
 			task = taskname
 		}
-		state, err := Resume(task)
+		state, err := Resume(task, pbg)
 		if err != nil && err.Error() == "state not existed" {
 			os.RemoveAll(FolderOf(taskname))
-			err = Execute(taskname, nil, conn, skiptls, dest)
+			err = Execute(taskname, nil, conn, skiptls, dest, pbg)
 			return err
 		}
-		err = Execute(state.Url, state, conn, skiptls, dest)
+		err = Execute(state.Url, state, conn, skiptls, dest, pbg)
 	} else {
-		err = Execute(taskname, nil, conn, skiptls, dest)
+		err = Execute(taskname, nil, conn, skiptls, dest, pbg)
 	}
 	return err
 }
 
-func Execute(url string, state *State, conn int, skiptls bool, dest string) (err error) {
+func Execute(url string, state *State, conn int, skiptls bool, dest string, pbg *mpb.Progress) (err error) {
 	//otherwise is hget <URL> command
 
 	signal_chan := make(chan os.Signal, 1)
@@ -92,7 +89,7 @@ func Execute(url string, state *State, conn int, skiptls bool, dest string) (err
 		downloader = &HttpDownloader{url: state.Url, file: dest, par: int64(len(state.Parts)), parts: state.Parts, resumable: true}
 	}
 	bars := make([]*mpb.Bar, 0)
-	go downloader.Do(doneChan, fileChan, errorChan, interruptChan, stateChan, bars)
+	go downloader.Do(doneChan, fileChan, errorChan, interruptChan, stateChan, bars, pbg)
 
 	for {
 		select {

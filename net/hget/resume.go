@@ -4,6 +4,8 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	mpb "github.com/vbauerster/mpb/v5"
 )
 
 func TaskPrint() error {
@@ -22,6 +24,6 @@ func TaskPrint() error {
 	return nil
 }
 
-func Resume(task string) (*State, error) {
-	return Read(task)
+func Resume(task string, pbg *mpb.Progress) (*State, error) {
+	return Read(task, pbg)
 }

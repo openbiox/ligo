@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 
 	cio "github.com/openbiox/ligo/io"
+	mpb "github.com/vbauerster/mpb/v5"
 )
 
 var dataFolder = ".config/bget/data"
@@ -48,7 +49,7 @@ func (s *State) Save() error {
 	return ioutil.WriteFile(filepath.Join(folder, stateFileName), j, 0644)
 }
 
-func Read(task string) (*State, error) {
+func Read(task string, pbg *mpb.Progress) (*State, error) {
 	file := filepath.Join(os.Getenv("HOME"), dataFolder, task, stateFileName)
 	if hasStateFile, _ := cio.PathExists(file); hasStateFile {
 		filler := makeLogBar(fmt.Sprintf("Getting state data from %s.", file))
