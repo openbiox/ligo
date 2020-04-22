@@ -64,7 +64,8 @@ func HTTPGetURLs(urls []string, destDir []string, opt *Params) (destFns []string
 				log.Warnf("Can not remove %s.", destFn)
 			}
 		}
-		if hasDestFn, _ := cio.PathExists(destFn); !hasDestFn || newOpt.Ignore {
+		hasStFn, _ := cio.PathExists(destFn + ".st")
+		if hasDestFn, _ := cio.PathExists(destFn); hasStFn || !hasDestFn || newOpt.Ignore {
 			url := urls[j]
 			sem <- true
 			go func(url string, destFn string, signalChan chan os.Signal) {
@@ -73,8 +74,6 @@ func HTTPGetURLs(urls []string, destDir []string, opt *Params) (destFns []string
 					case <-signalChan:
 						//send par number of interrupt for each routine
 						time.Sleep(3 * time.Second)
-						filler := makeLogBar(fmt.Sprintf("Existing ..."))
-						newOpt.Pbar.Add(0, filler).SetTotal(0, true)
 						os.Exit(130)
 						return
 					case <-sem:
@@ -141,8 +140,8 @@ func HTTPGetURL(url string, destFn string, opt *Params) error {
 		} else {
 			filler := makeLogBar(fmt.Sprintf("Failed to retrive on attempt %d...", t+1))
 			opt.Pbar.Add(0, filler).SetTotal(0, true)
-			filler = makeLogBar(fmt.Sprintf("error: %v", err))
-			opt.Pbar.Add(0, filler).SetTotal(0, true)
+			//filler = makeLogBar(fmt.Sprintf("error: %v", err))
+			//opt.Pbar.Add(0, filler).SetTotal(0, true)
 			filler = makeLogBar(fmt.Sprintf("retrying after %d seconds.", opt.RetSleepTime))
 			opt.Pbar.Add(0, filler).SetTotal(0, true)
 
@@ -229,13 +228,12 @@ func AsyncURL2(url string, destFn string, opt *Params) error {
 
 func hgetRetry(url string, destFn string, opt *Params) (err error) {
 	mode := ""
-	stateDir := path.Join(os.Getenv("HOME"), ".config/bget/data", filepath.Base(destFn))
 	hasDest, _ := cio.PathExists(destFn)
-	hasState, _ := cio.PathExists(stateDir)
+	hasState, _ := cio.PathExists(destFn + ".st")
 	if hasState {
 		mode = "resume"
 	} else if hasDest && !opt.Overwrite {
-		log.Infof("%s done.", destFn)
+		log.Infof("%s existed.", destFn)
 		return nil
 	}
 
@@ -249,8 +247,8 @@ func hgetRetry(url string, destFn string, opt *Params) (err error) {
 		} else {
 			filler := makeLogBar(fmt.Sprintf("Failed to retrive on attempt %d...", t+1))
 			opt.Pbar.Add(0, filler).SetTotal(0, true)
-			filler = makeLogBar(fmt.Sprintf("error: %v", err))
-			opt.Pbar.Add(0, filler).SetTotal(0, true)
+			//filler = makeLogBar(fmt.Sprintf("error: %v", err))
+			//opt.Pbar.Add(0, filler).SetTotal(0, true)
 			filler = makeLogBar(fmt.Sprintf("retrying after %d seconds.", opt.RetSleepTime))
 			opt.Pbar.Add(0, filler).SetTotal(0, true)
 

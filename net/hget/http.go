@@ -1,6 +1,7 @@
 package hget
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"net"
@@ -69,21 +70,20 @@ func NewHttpDownloader(url string, par int, skipTls bool, dest string) (*HttpDow
 	len, err := strconv.ParseInt(clen, 10, 64)
 	FatalCheck(err)
 
-	file := dest
 	ret := new(HttpDownloader)
 	ret.url = url
-	ret.file = file
+	ret.file = dest
 	ret.par = int64(par)
 	ret.len = len
 	ret.ips = ipstr
 	ret.skipTls = skipTls
-	ret.parts = partCalculate(int64(par), len, url)
+	ret.parts = partCalculate(int64(par), len, url, dest)
 	ret.resumable = resumable
 
 	return ret, nil
 }
 
-func partCalculate(par int64, len int64, url string) []Part {
+func partCalculate(par int64, len int64, url string, dest string) []Part {
 	ret := make([]Part, 0)
 	for j := int64(0); j < par; j++ {
 		from := (len / par) * j
@@ -93,16 +93,7 @@ func partCalculate(par int64, len int64, url string) []Part {
 		} else {
 			to = len
 		}
-
-		file := filepath.Base(url)
-		folder := FolderOf(url)
-		if err := MkdirIfNotExist(folder); err != nil {
-			Errorf("%v", err)
-			os.Exit(1)
-		}
-
-		fname := fmt.Sprintf("%s.part%d", file, j)
-		path := filepath.Join(folder, fname) // ~/.hget/download-file-name/part-name
+		path := dest // ~/.hget/download-file-name/part-name
 		ret = append(ret, Part{Url: url, Path: path, RangeFrom: from, RangeTo: to})
 	}
 	return ret
@@ -169,13 +160,10 @@ func (d *HttpDownloader) Do(doneChan chan bool, fileChan chan string, errorChan 
 				return
 			}
 
-			if d.par > 1 { //support range download just in case parallel factor is over 1
+			if d.resumable { //support range download just in case parallel factor is over 1
 				req.Header.Add("Range", ranges)
-				if err != nil {
-					errorChan <- err
-					return
-				}
 			}
+
 			gCurCookies = gCurCookieJar.Cookies(req.URL)
 
 			//write to file
@@ -185,7 +173,8 @@ func (d *HttpDownloader) Do(doneChan chan bool, fileChan chan string, errorChan 
 				return
 			}
 			defer resp.Body.Close()
-			f, err := os.OpenFile(part.Path, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0600)
+			var f *os.File
+			f, err = os.OpenFile(part.Path, os.O_CREATE|os.O_WRONLY, 0600)
 
 			defer f.Close()
 			if err != nil {
@@ -193,30 +182,44 @@ func (d *HttpDownloader) Do(doneChan chan bool, fileChan chan string, errorChan 
 				return
 			}
 
-			var writer io.Writer
-			writer = io.Writer(f)
-
+			var writer io.WriterAt
+			writer = io.WriterAt(f)
 			//make copy interruptable by copy 100 bytes each loop
 			current := int64(0)
 			for {
+				from := current + part.RangeFrom
 				select {
 				case <-interruptChan:
-					bar.Abort(false)
-					stateSaveChan <- Part{Url: d.url, Path: part.Path, RangeFrom: current + part.RangeFrom, RangeTo: part.RangeTo}
+					if DisplayProgressBar() {
+						bar.Abort(false)
+					}
+					stateSaveChan <- Part{Url: d.url, Path: part.Path, RangeFrom: from, RangeTo: part.RangeTo}
 					return
 				default:
 					var written int64
-					if DisplayProgressBar() {
+					var buf = &bytes.Buffer{}
+					if DisplayProgressBar() && d.resumable {
 						reader := bar.ProxyReader(resp.Body)
-						written, err = io.CopyN(writer, reader, 100)
-					} else {
-						written, err = io.CopyN(writer, io.Reader(resp.Body), 100)
+						written, err = io.CopyN(buf, reader, 100)
+						writer.WriteAt(buf.Bytes(), from)
+					} else if !DisplayProgressBar() && d.resumable {
+						written, err = io.CopyN(buf, io.Reader(resp.Body), 100)
+						writer.WriteAt(buf.Bytes(), from)
+					} else if DisplayProgressBar() && !d.resumable {
+						reader := bar.ProxyReader(resp.Body)
+						written, err = io.CopyN(buf, reader, 100)
+						writer.WriteAt(buf.Bytes(), current)
+					} else if !DisplayProgressBar() && !d.resumable {
+						written, err = io.CopyN(buf, io.Reader(resp.Body), 100)
+						writer.WriteAt(buf.Bytes(), current)
 					}
 					current += written
 					if err != nil {
 						if err != io.EOF && DisplayProgressBar() {
+							stateSaveChan <- Part{Url: d.url, Path: part.Path, RangeFrom: from, RangeTo: part.RangeTo}
 							errorChan <- err
 						} else if err != io.EOF {
+							stateSaveChan <- Part{Url: d.url, Path: part.Path, RangeFrom: from, RangeTo: part.RangeTo}
 							errorChan <- err
 						}
 						if DisplayProgressBar() {

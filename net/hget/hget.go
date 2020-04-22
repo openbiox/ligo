@@ -9,6 +9,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	cio "github.com/openbiox/ligo/io"
 	clog "github.com/openbiox/ligo/log"
 	mpb "github.com/vbauerster/mpb/v5"
 	"github.com/vbauerster/mpb/v5/decor"
@@ -24,7 +25,7 @@ var (
 	client = &http.Client{Transport: tr}
 )
 
-func Pull(taskname string, dest string, pg bool, thread int, mode string, timeout int, proxy string, pbg *mpb.Progress) (err error) {
+func Pull(url string, dest string, pg bool, thread int, mode string, timeout int, proxy string, pbg *mpb.Progress) (err error) {
 
 	client = NewHTTPClient(timeout, proxy)
 	if !pg {
@@ -33,26 +34,15 @@ func Pull(taskname string, dest string, pg bool, thread int, mode string, timeou
 	conn := thread
 	skiptls := true
 
-	if mode == "tasks" {
-		if err = TaskPrint(); err != nil {
-			return err
-		}
-	} else if mode == "resume" {
-		var task string
-		if IsUrl(taskname) {
-			task = TaskFromUrl(taskname)
-		} else {
-			task = taskname
-		}
-		state, err := Resume(task, pbg)
+	if mode == "resume" {
+		state, err := Resume(url, pbg, dest)
 		if err != nil && err.Error() == "state not existed" {
-			os.RemoveAll(FolderOf(taskname))
-			err = Execute(taskname, nil, conn, skiptls, dest, pbg)
+			err = Execute(url, nil, conn, skiptls, dest, pbg)
 			return err
 		}
 		err = Execute(state.Url, state, conn, skiptls, dest, pbg)
 	} else {
-		err = Execute(taskname, nil, conn, skiptls, dest, pbg)
+		err = Execute(url, nil, conn, skiptls, dest, pbg)
 	}
 	return err
 }
@@ -96,8 +86,10 @@ func Execute(url string, state *State, conn int, skiptls bool, dest string, pbg 
 		case <-signal_chan:
 			//send par number of interrupt for each routine
 			isInterrupted = true
-			for i := range bars {
-				bars[i].Abort(false)
+			if DisplayProgressBar() {
+				for i := range bars {
+					bars[i].Abort(false)
+				}
 			}
 			for i := 0; i < conn; i++ {
 				interruptChan <- true
@@ -107,19 +99,23 @@ func Execute(url string, state *State, conn int, skiptls bool, dest string, pbg 
 		case err := <-errorChan:
 			filler := makeLogBar(err.Error())
 			pbg.Add(0, filler).SetTotal(0, true)
+			s := &State{Url: url, Parts: parts}
+			s.Save(dest)
 			return err
 		case part := <-stateChan:
 			parts = append(parts, part)
 		case <-doneChan:
 			if isInterrupted {
 				if downloader.resumable {
-					for i := range bars {
-						bars[i].Abort(false)
+					if DisplayProgressBar() {
+						for i := range bars {
+							bars[i].Abort(false)
+						}
 					}
 					filler := makeLogBar(fmt.Sprintf("Interrupted, saving state ..."))
 					pbg.Add(0, filler).SetTotal(0, true)
 					s := &State{Url: url, Parts: parts}
-					err = s.Save()
+					err = s.Save(dest)
 					if err != nil {
 						filler := makeLogBar(err.Error())
 						pbg.Add(0, filler).SetTotal(0, true)
@@ -131,15 +127,12 @@ func Execute(url string, state *State, conn int, skiptls bool, dest string, pbg 
 					}
 					filler := makeLogBar(fmt.Sprintf("Interrupted, but downloading url is not resumable, silently die"))
 					pbg.Add(0, filler).SetTotal(0, true)
-					os.RemoveAll(FolderOf(url))
-					return nil
-				}
-			} else {
-				err := JoinFile(files, dest)
-				if err != nil {
 					return err
 				}
-				os.RemoveAll(FolderOf(url))
+			} else {
+				if hasStFile, _ := cio.PathExists(dest + ".st"); hasStFile {
+					err = os.Remove(dest + ".st")
+				}
 				return nil
 			}
 		}
