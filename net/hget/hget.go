@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	cio "github.com/openbiox/ligo/io"
 	clog "github.com/openbiox/ligo/log"
@@ -50,12 +51,14 @@ func Pull(url string, dest string, pg bool, thread int, mode string, timeout int
 func Execute(url string, state *State, conn int, skiptls bool, dest string, pbg *mpb.Progress) (err error) {
 	//otherwise is hget <URL> command
 
-	signal_chan := make(chan os.Signal, 1)
-	signal.Notify(signal_chan,
+	signalChan := make(chan os.Signal, 1)
+	signal.Notify(signalChan,
 		syscall.SIGHUP,
 		syscall.SIGINT,
 		syscall.SIGTERM,
-		syscall.SIGQUIT)
+		syscall.SIGQUIT,
+		syscall.SIGKILL,
+		syscall.SIGSTOP)
 
 	//set up parallel
 
@@ -83,7 +86,7 @@ func Execute(url string, state *State, conn int, skiptls bool, dest string, pbg 
 
 	for {
 		select {
-		case <-signal_chan:
+		case <-signalChan:
 			//send par number of interrupt for each routine
 			isInterrupted = true
 			if DisplayProgressBar() {
@@ -120,6 +123,8 @@ func Execute(url string, state *State, conn int, skiptls bool, dest string, pbg 
 						filler := makeLogBar(err.Error())
 						pbg.Add(0, filler).SetTotal(0, true)
 					}
+					time.Sleep(1 * time.Second)
+					os.Exit(130)
 					return err
 				} else {
 					for i := range bars {

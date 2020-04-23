@@ -69,21 +69,21 @@ func HTTPGetURLs(urls []string, destDir []string, opt *Params) (destFns []string
 			url := urls[j]
 			sem <- true
 			go func(url string, destFn string, signalChan chan os.Signal) {
-				defer func() {
-					select {
-					case <-signalChan:
-						//send par number of interrupt for each routine
-						time.Sleep(3 * time.Second)
-						os.Exit(130)
-						return
-					case <-sem:
-						return
-					}
-				}()
+				time.Sleep(2 * time.Second)
 				err := AsyncURL2(url, destFn, &newOpt)
 				if err == nil {
 					destFns = append(destFns, destFn)
 				}
+				defer func() {
+					select {
+					case <-signalChan:
+						//send par number of interrupt for each routine
+						time.Sleep(2 * time.Second)
+						os.Exit(130)
+					case <-sem:
+						return
+					}
+				}()
 			}(url, destFn, signalChan)
 		} else {
 			destFns = append(destFns, destFn)
@@ -239,8 +239,32 @@ func hgetRetry(url string, destFn string, opt *Params) (err error) {
 
 	var t int
 	var success = false
+	signalChan := make(chan os.Signal, 1)
+	signal.Notify(signalChan,
+		syscall.SIGHUP,
+		syscall.SIGINT,
+		syscall.SIGTERM,
+		syscall.SIGQUIT,
+		syscall.SIGKILL,
+		syscall.SIGSTOP)
+
+	var wg sync.WaitGroup
 	for t = 0; t < opt.Retries; t++ {
-		err = hget.Pull(url, destFn, !opt.Quiet, opt.ThreadQuery, mode, opt.Timeout, opt.Proxy, opt.Pbar)
+		wg.Add(1)
+		go func() {
+			defer func() {
+				select {
+				case <-signalChan:
+					time.Sleep(2 * time.Second)
+					os.Exit(130)
+					return
+				}
+			}()
+			time.Sleep(1 * time.Second)
+			err = hget.Pull(url, destFn, !opt.Quiet, opt.ThreadQuery, mode, opt.Timeout, opt.Proxy, opt.Pbar)
+			wg.Done()
+		}()
+		wg.Wait()
 		if err == nil {
 			success = true
 			break
