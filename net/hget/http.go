@@ -217,6 +217,7 @@ func (d *HttpDownloader) Do(doneChan chan bool, fileChan chan string, errorChan 
 					if err != nil {
 						if err != io.EOF && DisplayProgressBar() {
 							stateSaveChan <- Part{Url: d.url, Path: part.Path, RangeFrom: from, RangeTo: part.RangeTo}
+							bar.Abort(false)
 							errorChan <- err
 						} else if err != io.EOF {
 							stateSaveChan <- Part{Url: d.url, Path: part.Path, RangeFrom: from, RangeTo: part.RangeTo}
