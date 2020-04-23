@@ -12,16 +12,16 @@ import (
 
 // SraFields defines extracted Sra fields
 type SraFields struct {
-	Title        *string
-	StudyTitle   *string
-	Abstract     *string
-	Type         *string
-	SRX          *string
-	SRA          *string
-	SRAFile      *parse.SRAFileJSON
-	Correlation  *map[string]string
-	AbstractURLs *[]string
-	Keywords     *[]string
+	Title        string
+	StudyTitle   string
+	Abstract     string
+	Type         string
+	SRX          string
+	SRA          string
+	SRAFile      parse.SRAFileJSON
+	Correlation  map[string]string
+	AbstractURLs []string
+	Keywords     []string
 }
 
 func GetSimpleSraFields(keywords *[]string, sra *parse.ExperimentPkgJSON, callCor bool, done map[string]int) *SraFields {
@@ -30,12 +30,12 @@ func GetSimpleSraFields(keywords *[]string, sra *parse.ExperimentPkgJSON, callCo
 	doc, err := prose.NewDocument(titleAbs)
 	if done[sra.EXPERIMENT.TITLE+sra.STUDY.DESCRIPTOR.STUDYTITLE] == 1 {
 		return &SraFields{
-			Title:      &sra.EXPERIMENT.TITLE,
-			StudyTitle: &sra.STUDY.DESCRIPTOR.STUDYTITLE,
-			Type:       &sra.STUDY.DESCRIPTOR.STUDYTYPE.ExistingStudyType,
-			SRX:        &sra.EXPERIMENT.Accession,
-			SRA:        &sra.RUNSET.RUN.Accession,
-			SRAFile:    &sra.RUNSET.RUN.SRAFiles.SRAFile,
+			Title:      sra.EXPERIMENT.TITLE,
+			StudyTitle: sra.STUDY.DESCRIPTOR.STUDYTITLE,
+			Type:       sra.STUDY.DESCRIPTOR.STUDYTYPE.ExistingStudyType,
+			SRX:        sra.EXPERIMENT.Accession,
+			SRA:        sra.RUNSET.RUN.Accession,
+			SRAFile:    sra.RUNSET.RUN.SRAFiles.SRAFile,
 		}
 	}
 	corela := make(map[string]string)
@@ -50,15 +50,15 @@ func GetSimpleSraFields(keywords *[]string, sra *parse.ExperimentPkgJSON, callCo
 		log.Warn(err)
 	}
 	return &SraFields{
-		Title:        &sra.EXPERIMENT.TITLE,
-		StudyTitle:   &sra.STUDY.DESCRIPTOR.STUDYTITLE,
-		Abstract:     &sra.STUDY.DESCRIPTOR.STUDYABSTRACT,
-		Type:         &sra.STUDY.DESCRIPTOR.STUDYTYPE.ExistingStudyType,
-		SRX:          &sra.EXPERIMENT.Accession,
-		SRA:          &sra.RUNSET.RUN.Accession,
-		SRAFile:      &sra.RUNSET.RUN.SRAFiles.SRAFile,
-		Correlation:  &corela,
-		AbstractURLs: &urls,
-		Keywords:     &key,
+		Title:        sra.EXPERIMENT.TITLE,
+		StudyTitle:   sra.STUDY.DESCRIPTOR.STUDYTITLE,
+		Abstract:     sra.STUDY.DESCRIPTOR.STUDYABSTRACT,
+		Type:         sra.STUDY.DESCRIPTOR.STUDYTYPE.ExistingStudyType,
+		SRX:          sra.EXPERIMENT.Accession,
+		SRA:          sra.RUNSET.RUN.Accession,
+		SRAFile:      sra.RUNSET.RUN.SRAFiles.SRAFile,
+		Correlation:  corela,
+		AbstractURLs: urls,
+		Keywords:     key,
 	}
 }

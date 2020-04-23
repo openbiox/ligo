@@ -16,12 +16,12 @@ var log = clog.Logger
 
 // PubmedFields defines extracted Pubmed fields
 type PubmedFields struct {
-	Pmid, Doi, Title, Abs, Journal, Issue, Volume, Date, Issn *string
-	Author                                                    *[]string
-	Affiliation                                               *[]string
-	Correlation                                               *map[string]string
-	URLs                                                      *[]string
-	Keywords                                                  *[]string
+	Pmid, Doi, Title, Abs, Journal, Issue, Volume, Date, Issn string
+	Author                                                    []string
+	Affiliation                                               []string
+	Correlation                                               map[string]string
+	URLs                                                      []string
+	Keywords                                                  []string
 }
 
 func GetSimplePubmedFields(keywords *[]string, article *parse.PubmedArticleJSON, callCor bool) *PubmedFields {
@@ -67,20 +67,20 @@ func GetSimplePubmedFields(keywords *[]string, article *parse.PubmedArticleJSON,
 		affiliation = append(affiliation, affiliationTmp)
 	}
 	return &PubmedFields{
-		Pmid:        &pmid,
-		Doi:         &doi,
-		Title:       &article.MedlineCitation.Article.ArticleTitle.Text,
-		Abs:         &abs,
-		Journal:     &article.MedlineCitation.Article.Journal.ISOAbbreviation,
-		Issn:        &article.MedlineCitation.Article.Journal.ISSN.Text,
-		Date:        &date,
-		Issue:       &article.MedlineCitation.Article.Journal.JournalIssue.Issue,
-		Volume:      &article.MedlineCitation.Article.Journal.JournalIssue.Volume,
-		Author:      &author,
-		Affiliation: &affiliation,
-		Correlation: &corela,
-		URLs:        &urls,
-		Keywords:    &key,
+		Pmid:        pmid,
+		Doi:         doi,
+		Title:       article.MedlineCitation.Article.ArticleTitle.Text,
+		Abs:         abs,
+		Journal:     article.MedlineCitation.Article.Journal.ISOAbbreviation,
+		Issn:        article.MedlineCitation.Article.Journal.ISSN.Text,
+		Date:        date,
+		Issue:       article.MedlineCitation.Article.Journal.JournalIssue.Issue,
+		Volume:      article.MedlineCitation.Article.Journal.JournalIssue.Volume,
+		Author:      author,
+		Affiliation: affiliation,
+		Correlation: corela,
+		URLs:        urls,
+		Keywords:    key,
 	}
 }
 
