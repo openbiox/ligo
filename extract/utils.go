@@ -41,9 +41,7 @@ func getKeywordsCorleations(doc *prose.Document, keywordsPat *string, sentThread
 			kStr := stringo.StrExtract(sent.Text, *keywordsPat, -1)
 			sort.Sort(sort.StringSlice(kStr))
 			for k := range kStr {
-				if kStr[k] != "mol/" && kStr[k] != "B" {
-					kStr[k] = formartKey(kStr[k])
-				}
+				kStr[k] = formartKey(kStr[k])
 			}
 			kStr = slice.DropSliceDup(kStr)
 			if len(kStr) >= 2 {
@@ -74,8 +72,8 @@ func removeDuplicatesAndEmpty(a []string) (ret []string) {
 }
 
 func formartKey(key string) string {
-	key = stringo.StrRemoveAll(key, "^\n|[\n$")
-	key = stringo.StrRemoveAll(key, "^\\n|[\\n$")
+	key = stringo.StrRemoveAll(key, "\n|\n")
+	key = stringo.StrRemoveAll(key, "\\n|\\n")
 	key = stringo.StrRemoveAll(key, "^[)]|[(]$")
 	key = stringo.StrRemoveAll(key, "^[(]|[)]$")
 	key = stringo.StrRemoveAll(key, "^[-]|[-]$")
