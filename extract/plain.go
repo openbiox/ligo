@@ -1,6 +1,8 @@
 package extract
 
 import (
+	"sort"
+
 	"github.com/openbiox/ligo/slice"
 	"github.com/openbiox/ligo/stringo"
 	prose "gopkg.in/jdkato/prose.v2"
@@ -34,6 +36,8 @@ func GetPlainFields(filename string, dat *[]byte, keywordsPat *string, callCor b
 		key[k] = formartKey(key[k])
 	}
 	key = slice.DropSliceDup(key)
+	sort.Sort(sort.StringSlice(key))
+
 	var corela map[string][]string
 	if callCor {
 		corela = getKeywordsCorleations(doc, keywordsPat, thread)

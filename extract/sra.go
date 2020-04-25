@@ -2,6 +2,7 @@ package extract
 
 import (
 	"encoding/json"
+	"sort"
 	"sync"
 
 	"github.com/openbiox/ligo/parse"
@@ -59,6 +60,7 @@ func GetSimpleSraFields(filename string, dat *[]byte, keywordsPat *string, callC
 				key[k] = formartKey(key[k])
 			}
 			key = slice.DropSliceDup(key)
+			sort.Sort(sort.StringSlice(key))
 			var corela map[string][]string
 			if callCor {
 				corela = getKeywordsCorleations(doc, keywordsPat, 10)

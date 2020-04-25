@@ -3,6 +3,7 @@ package extract
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
 	"sync"
 
 	clog "github.com/openbiox/ligo/log"
@@ -79,6 +80,7 @@ func GetSimplePubmedFields(filename string, dat *[]byte, keywordsPat *string, ca
 				key[k] = formartKey(key[k])
 			}
 			key = slice.DropSliceDup(key)
+			sort.Sort(sort.StringSlice(key))
 
 			doc, err := prose.NewDocument(titleAbs)
 			var corela map[string][]string
