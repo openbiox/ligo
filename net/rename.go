@@ -21,12 +21,12 @@ func FormatURLfileName(url string, remoteName bool, timeout int, proxy string) (
 		if err != nil {
 			log.Warnln(err)
 		} else {
-		    defer resp.Body.Close()
-		    fname = resp2Filname(resp)
-		    if fname != "" {
-		        return fname
-		    }
-        }
+			defer resp.Body.Close()
+			fname = resp2Filname(resp)
+			if fname != "" {
+				return fname
+			}
+		}
 	} else if remoteName {
 		client := &http.Client{
 			CheckRedirect: func(req *http.Request, via []*http.Request) error {
@@ -37,12 +37,12 @@ func FormatURLfileName(url string, remoteName bool, timeout int, proxy string) (
 		if err != nil {
 			log.Warnln(err)
 		} else {
-		    defer resp.Body.Close()
-		    fname = resp2Filname(resp)
-		    if fname != "" {
-			    return fname
-		    }
-        }
+			defer resp.Body.Close()
+			fname = resp2Filname(resp)
+			if fname != "" {
+				return fname
+			}
+		}
 	}
 	u, _ := neturl.Parse(url)
 	uQ := u.Query()
@@ -51,7 +51,9 @@ func FormatURLfileName(url string, remoteName bool, timeout int, proxy string) (
 		return path.Base(u.EscapedPath())
 	}
 	// cell.com
-	if stringo.StrDetect(url, "/pdfExtended/|/pdfdirect/|/Article/Pdf/|/content/articlepdf/|/rmp/pdf/") {
+	if stringo.StrDetect(url, "[?]X-Amz-Security-Token=") {
+		fname = stringo.StrReplaceAll(path.Base(url), "[?]X-Amz-Security-Token=.*", "")
+	} else if stringo.StrDetect(url, "/pdfExtended/|/pdfdirect/|/Article/Pdf/|/content/articlepdf/|/rmp/pdf/") {
 		fname = path.Base(url) + ".pdf"
 	} else if stringo.StrDetect(url, "showPdf[?]pii=") {
 		fname = path.Base(stringo.StrReplaceAll(url, "showPdf[?]pii=", "")) + ".pdf"

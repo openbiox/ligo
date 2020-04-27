@@ -22,6 +22,7 @@ func TestHttpGetURLs(t *testing.T) {
 		"http://www.openbioinformatics.org/annovar/download/hg19_clinvar_20170130.txt.gz",
 		"http://www.openbioinformatics.org/annovar/download/hg19_clinvar_20170905.txt.gz"}
 	//urls := []string{"https://github.com/openanno/bget"}
+	urls = []string{"https://www.sciencedirect.com/science/article/pii/S2211034820301747/pdfft?md5=2fe69b9687518895596f0c2c1c55c8ed&pid=1-s2.0-S2211034820301747-main.pdf"}
 	destDir := []string{}
 	for range urls {
 		destDir = append(destDir, "/cluster/home/ljf/repositories/github/openbiox/ligo/net/a")
@@ -30,7 +31,7 @@ func TestHttpGetURLs(t *testing.T) {
 	param.Retries = 5
 	param.Engine = "default"
 	param.Timeout = 35
-	param.Overwrite = false
+	param.Overwrite = true
 	param.Quiet = false
 	param.Ignore = true
 	param.TaskID = "test"

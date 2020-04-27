@@ -129,7 +129,7 @@ func HTTPGetURL(url string, destFn string, opt *Params) error {
 		return err
 	}
 	gCurCookies = gCurCookieJar.Cookies(req.URL)
-
+	hget.SciencedirectassetsRed(url, req, client)
 	var t int
 	var success = false
 	for t = 0; t < opt.Retries; t++ {

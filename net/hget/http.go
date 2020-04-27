@@ -159,6 +159,7 @@ func (d *HttpDownloader) Do(doneChan chan bool, fileChan chan string, errorChan 
 				errorChan <- err
 				return
 			}
+			SciencedirectassetsRed(d.url, req, client)
 
 			if d.resumable { //support range download just in case parallel factor is over 1
 				req.Header.Add("Range", ranges)
