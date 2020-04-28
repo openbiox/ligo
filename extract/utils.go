@@ -84,6 +84,7 @@ func formartKey(key string) string {
 	key = stringo.StrRemoveAll(key, "^[[]|[]]$")
 	key = stringo.StrRemoveAll(key, "^\"|\"$")
 	key = stringo.StrRemoveAll(key, "^['（; ?]|[; ?）']$")
+	key = stringo.StrRemoveAll(key, "^[“_-><”&~!@#$%*+-`•]|[•“_-><”&~!@#$%*+-`]$")
 
 	return key
 }
