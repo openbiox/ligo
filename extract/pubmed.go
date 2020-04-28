@@ -6,15 +6,12 @@ import (
 	"sort"
 	"sync"
 
-	clog "github.com/openbiox/ligo/log"
 	"github.com/openbiox/ligo/parse"
 	"github.com/openbiox/ligo/slice"
 	"github.com/openbiox/ligo/stringo"
 	prose "gopkg.in/jdkato/prose.v2"
 	xurls "mvdan.cc/xurls/v2"
 )
-
-var log = clog.Logger
 
 // PubmedFields defines extracted Pubmed fields
 type PubmedFields struct {

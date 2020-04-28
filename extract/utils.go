@@ -8,10 +8,13 @@ import (
 	"strings"
 	"sync"
 
+	clog "github.com/openbiox/ligo/log"
 	"github.com/openbiox/ligo/slice"
 	"github.com/openbiox/ligo/stringo"
 	prose "gopkg.in/jdkato/prose.v2"
 )
+
+var log = clog.Logger
 
 func readDocFile(filename string) (dat []byte, err error) {
 	var of *os.File
@@ -79,6 +82,8 @@ func formartKey(key string) string {
 	key = stringo.StrRemoveAll(key, "^[-]|[-]$")
 	key = stringo.StrRemoveAll(key, "^[% ,./:=]|[% ,./:=]$")
 	key = stringo.StrRemoveAll(key, "^[[]|[]]$")
+	key = stringo.StrRemoveAll(key, "^\"|\"$")
+	key = stringo.StrRemoveAll(key, "^['（; ?]|[; ?）']$")
 
 	return key
 }
