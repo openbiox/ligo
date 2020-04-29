@@ -26,7 +26,7 @@ type SraFields struct {
 	Keywords     []string
 }
 
-func GetSimpleSraFields(filename string, dat *[]byte, keywordsPat *string, callCor bool, thread int) (sraFields []SraFields, err error) {
+func GetSimpleSraFields(filename string, dat *[]byte, keywordsPat *string, callCor bool, callURLs bool, keepAbs bool, thread int) (sraFields []SraFields, err error) {
 	var sraJSON []parse.ExperimentPkgJSON
 	var lock sync.Mutex
 	if dat == nil {
@@ -48,13 +48,20 @@ func GetSimpleSraFields(filename string, dat *[]byte, keywordsPat *string, callC
 			defer func() {
 				<-sem
 			}()
+			var urls []string
 			titleAbs := sra.EXPERIMENT.TITLE + "\n" + sra.STUDY.DESCRIPTOR.STUDYTITLE +
 				"\n" + sra.STUDY.DESCRIPTOR.STUDYABSTRACT
 			doc, err := prose.NewDocument(titleAbs)
 			if done[sra.EXPERIMENT.TITLE+sra.STUDY.DESCRIPTOR.STUDYTITLE] == 1 {
 				return
 			}
-			urls := xurls.Relaxed().FindAllString(titleAbs, -1)
+			if callURLs {
+				urls = xurls.Relaxed().FindAllString(titleAbs, -1)
+			}
+			abs := sra.STUDY.DESCRIPTOR.STUDYABSTRACT
+			if !keepAbs {
+				abs = ""
+			}
 			key := stringo.StrExtract(titleAbs, *keywordsPat, -1)
 			for k := range key {
 				key[k] = formartKey(key[k])
@@ -72,7 +79,7 @@ func GetSimpleSraFields(filename string, dat *[]byte, keywordsPat *string, callC
 			sraFields = append(sraFields, SraFields{
 				Title:        sra.EXPERIMENT.TITLE,
 				StudyTitle:   sra.STUDY.DESCRIPTOR.STUDYTITLE,
-				Abstract:     sra.STUDY.DESCRIPTOR.STUDYABSTRACT,
+				Abstract:     abs,
 				Type:         sra.STUDY.DESCRIPTOR.STUDYTYPE.ExistingStudyType,
 				SRX:          sra.EXPERIMENT.Accession,
 				SRA:          sra.RUNSET.RUN.Accession,

@@ -27,7 +27,7 @@ type SimplePubmedFieldsOpt struct {
 	Title, Abs, Journal, Issue, Volume, Date, Issn, Author, Affiliation, URLs, Keywords bool
 }
 
-func GetSimplePubmedFields(filename string, dat *[]byte, keywordsPat *string, callCor bool, thread int) (pubMedFields []PubmedFields, err error) {
+func GetSimplePubmedFields(filename string, dat *[]byte, keywordsPat *string, callCor bool, callURLs bool, keepAbs bool, thread int) (pubMedFields []PubmedFields, err error) {
 	var pubmedJSON []parse.PubmedArticleJSON
 	var lock sync.Mutex
 	if dat == nil {
@@ -50,6 +50,7 @@ func GetSimplePubmedFields(filename string, dat *[]byte, keywordsPat *string, ca
 			defer func() {
 				<-sem
 			}()
+			var urls []string
 			year := article.MedlineCitation.Article.ArticleDate.Year
 			month := article.MedlineCitation.Article.ArticleDate.Month
 			day := article.MedlineCitation.Article.ArticleDate.Day
@@ -71,7 +72,12 @@ func GetSimplePubmedFields(filename string, dat *[]byte, keywordsPat *string, ca
 			title := article.MedlineCitation.Article.ArticleTitle.Text
 			title = stringo.StrReplaceAll(title, "\n", "\\n")
 			titleAbs := title + "\n" + abs
-			urls := xurls.Relaxed().FindAllString(titleAbs, -1)
+			if callURLs {
+				urls = xurls.Relaxed().FindAllString(titleAbs, -1)
+			}
+			if !keepAbs {
+				abs = ""
+			}
 			key := stringo.StrExtract(titleAbs, *keywordsPat, -1)
 			for k := range key {
 				key[k] = formartKey(key[k])

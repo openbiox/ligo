@@ -12,7 +12,7 @@ import (
 	xurls "mvdan.cc/xurls/v2"
 )
 
-func GetBigdFields(filename string, dat *[]byte, keywordsPat *string, callCor bool, thread int) (articleFields []parse.BigdArticle, err error) {
+func GetBigdFields(filename string, dat *[]byte, keywordsPat *string, callCor bool, callURLs bool, keepAbs bool, thread int) (articleFields []parse.BigdArticle, err error) {
 	var dataJSON parse.BigdArticleList
 	var lock sync.Mutex
 	if dat == nil {
@@ -40,7 +40,12 @@ func GetBigdFields(filename string, dat *[]byte, keywordsPat *string, callCor bo
 			article.Abst = stringo.StrReplaceAll(article.Abst, "\n  *", "\n")
 			article.Abst = stringo.StrReplaceAll(article.Abst, "\n", "\\n")
 			titleAbs := article.Title + "\n" + article.Abst
-			article.URLs = xurls.Relaxed().FindAllString(titleAbs, -1)
+			if callURLs {
+				article.URLs = xurls.Relaxed().FindAllString(titleAbs, -1)
+			}
+			if !keepAbs {
+				article.Abst = ""
+			}
 			article.Keywords = stringo.StrExtract(titleAbs, *keywordsPat, -1)
 			for k := range article.Keywords {
 				article.Keywords[k] = formartKey(article.Keywords[k])

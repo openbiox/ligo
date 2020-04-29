@@ -16,8 +16,9 @@ type PlainTextFields struct {
 	Keywords    []string
 }
 
-func GetPlainFields(filename string, dat *[]byte, keywordsPat *string, callCor bool, thread int) (plain PlainTextFields, err error) {
+func GetPlainFields(filename string, dat *[]byte, keywordsPat *string, callCor bool, callURLs bool, thread int) (plain PlainTextFields, err error) {
 	var doc *prose.Document
+	var urls []string
 	if dat == nil {
 		dat = &[]byte{}
 	}
@@ -30,7 +31,9 @@ func GetPlainFields(filename string, dat *[]byte, keywordsPat *string, callCor b
 	if doc, err = prose.NewDocument(datStr); err != nil {
 		return plain, err
 	}
-	urls := slice.DropSliceDup(xurls.Relaxed().FindAllString(datStr, -1))
+	if callURLs {
+		urls = slice.DropSliceDup(xurls.Relaxed().FindAllString(datStr, -1))
+	}
 	key := stringo.StrExtract(datStr, *keywordsPat, -1)
 	for k := range key {
 		key[k] = formartKey(key[k])
