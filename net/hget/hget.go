@@ -57,8 +57,7 @@ func Execute(url string, state *State, conn int, skiptls bool, dest string, pbg 
 		syscall.SIGINT,
 		syscall.SIGTERM,
 		syscall.SIGQUIT,
-		syscall.SIGKILL,
-		syscall.SIGSTOP)
+		syscall.SIGKILL)
 
 	//set up parallel
 

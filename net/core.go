@@ -245,8 +245,7 @@ func hgetRetry(url string, destFn string, opt *Params) (err error) {
 		syscall.SIGINT,
 		syscall.SIGTERM,
 		syscall.SIGQUIT,
-		syscall.SIGKILL,
-		syscall.SIGSTOP)
+		syscall.SIGKILL)
 
 	var wg sync.WaitGroup
 	for t = 0; t < opt.Retries; t++ {
