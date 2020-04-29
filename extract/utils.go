@@ -77,6 +77,7 @@ func removeDuplicatesAndEmpty(a []string) (ret []string) {
 func formartKey(key string) string {
 	key = stringo.StrRemoveAll(key, "\n|\n")
 	key = stringo.StrRemoveAll(key, "\\n|\\n")
+	key = stringo.StrReplaceAll(key, "\t|\\t", " ")
 	key = stringo.StrRemoveAll(key, "^[)]|[(]$")
 	key = stringo.StrRemoveAll(key, "^[(]|[)]$")
 	key = stringo.StrRemoveAll(key, "^[-]|[-]$")
@@ -85,6 +86,7 @@ func formartKey(key string) string {
 	key = stringo.StrRemoveAll(key, "^\"|\"$")
 	key = stringo.StrRemoveAll(key, "^['（; ?]|[; ?）']$")
 	key = stringo.StrRemoveAll(key, "^[“_-><”&~!@#$%*+-`•]|[•“_-><”&~!@#$%*+-`]$")
+	key = stringo.StrRemoveAll(key, "^-|-$")
 
 	return key
 }
