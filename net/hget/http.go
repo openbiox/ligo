@@ -44,7 +44,7 @@ func NewHttpDownloader(url string, par int, skipTls bool, dest string) (*HttpDow
 	ips, err := net.LookupIP(parsed.Host)
 
 	ipstr := FilterIPV4(ips)
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest("HEAD", url, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +66,6 @@ func NewHttpDownloader(url string, par int, skipTls bool, dest string) (*HttpDow
 		par = 1
 		resumable = false
 	}
-
 	len, err := strconv.ParseInt(clen, 10, 64)
 	FatalCheck(err)
 

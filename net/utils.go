@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"unicode/utf8"
 
@@ -84,7 +85,10 @@ func downloadWorker(client *http.Client, req *http.Request, url string, destFn s
 		//return errors.New("Redirect fail")
 		return nil
 	}
-	size := resp.ContentLength
+	req2, _ := http.NewRequest("HEAD", url, nil)
+	resp2, _ := client.Do(req2)
+
+	size, _ := strconv.Atoi(resp2.Header.Get("Content-Length"))
 
 	if hasParDir, _ := cio.PathExists(filepath.Dir(destFn)); !hasParDir {
 		err = cio.CreateFileParDir(destFn)
@@ -107,7 +111,7 @@ func downloadWorker(client *http.Client, req *http.Request, url string, destFn s
 	}
 	prefixStr = fmt.Sprintf("%-18s\t", prefixStr)
 	if !opt.Quiet {
-		bar := opt.Pbar.AddBar(size,
+		bar := opt.Pbar.AddBar(int64(size),
 			mpb.BarNoPop(),
 			mpb.BarStyle("[=>-|"),
 			mpb.PrependDecorators(
