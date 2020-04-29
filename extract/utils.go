@@ -51,7 +51,7 @@ func getKeywordsCorleations(doc *prose.Document, keywordsPat *string, sentThread
 				key := strings.Join(kStr, "+")
 				key = stringo.StrReplaceAll(key, " [+]", "+")
 				lock.Lock()
-				corela[key] = append(corela[key], sent.Text)
+				corela[key] = append(corela[key], formatSentText(sent.Text))
 				lock.Unlock()
 			}
 		}(sent)
@@ -87,6 +87,13 @@ func formartKey(key string) string {
 	key = stringo.StrRemoveAll(key, "^['（; ?]|[; ?）']$")
 	key = stringo.StrRemoveAll(key, "^[“_-><”&~!@#$%*+-`•]|[•“_-><”&~!@#$%*+-`]$")
 	key = stringo.StrRemoveAll(key, "^-|-$")
+	key = stringo.StrRemoveAll(key, "^‐|‐$")
 
 	return key
+}
+
+func formatSentText(text string) string {
+	text = stringo.StrReplaceAll(text, "\n\n", " ")
+	text = stringo.StrReplaceAll(text, "\n", " ")
+	return text
 }
