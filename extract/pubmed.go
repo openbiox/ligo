@@ -63,9 +63,11 @@ func GetSimplePubmedFields(filename string, dat *[]byte, keywordsPat *string, ca
 					doi = v.Text
 				}
 			}
+			lock.Lock()
 			if done[pmid] == 1 {
 				return
 			}
+			lock.Unlock()
 			abs = stringo.StrReplaceAll(article.MedlineCitation.Article.Abstract.AbstractText.Text, "\n  *", "\n")
 			abs = stringo.StrReplaceAll(abs, "(<[/]AbstractText.*>)|(^\n)|(\n$)", "")
 			abs = stringo.StrReplaceAll(abs, "\n", "\\n")

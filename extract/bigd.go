@@ -34,9 +34,11 @@ func GetBigdFields(filename string, dat *[]byte, keywordsPat *string, callCor bo
 			defer func() {
 				<-sem
 			}()
+			lock.Lock()
 			if done[article.ID] == 1 {
 				return
 			}
+			lock.Unlock()
 			article.Abst = stringo.StrReplaceAll(article.Abst, "\n  *", "\n")
 			article.Abst = stringo.StrReplaceAll(article.Abst, "\n", "\\n")
 			titleAbs := article.Title + "\n" + article.Abst
