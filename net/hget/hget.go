@@ -12,7 +12,7 @@ import (
 
 	cio "github.com/openbiox/ligo/io"
 	clog "github.com/openbiox/ligo/log"
-	mpb "github.com/vbauerster/mpb/v5"
+	"github.com/vbauerster/mpb/v5"
 	"github.com/vbauerster/mpb/v5/decor"
 )
 
@@ -144,7 +144,7 @@ func Execute(url string, state *State, conn int, skiptls bool, dest string, pbg 
 }
 
 func makeLogBar(msg string) mpb.BarFiller {
-	return mpb.BarFillerFunc(func(w io.Writer, width int, st *decor.Statistics) {
+	return mpb.BarFillerFunc(func(w io.Writer, _ int, _ decor.Statistics) {
 		fmt.Fprintf(w, msg)
 	})
 }

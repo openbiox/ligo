@@ -11,13 +11,13 @@ import (
 func TestHttpGetURLs(t *testing.T) {
 	// urls := []string{"https://dldir1.qq.com/qqfile/qq/PCQQ9.1.6/25786/QQ9.1.6.25786.exe",
 	//	"https://dldir1.qq.com/weixin/Windows/WeChatSetup.exe"}
-	//urls := []string{"http://61.129.70.139:3030/api/viewfile/?path=/tmp/hiplot-It8jqd/a7yqy740q78.tar"}
+	//urls := []string{"https://hiplot.com.cn/api/viewfile/?path=/tmp/hiplot-It8jqd/a7yqy740q78.tar"}
 	urls := []string{
-		"http://61.129.70.139:3030/api/viewfile/?path=/tmp/hiplot-ox4t9X/cob38g8rgqv.tar",
-		"http://61.129.70.139:3030/api/viewfile/?path=/tmp/hiplot-Jcw5fC/s1051on90mh.tar",
-		"http://61.129.70.139:3030/api/viewfile/?path=/tmp/hiplot-It8jqd/a7yqy740q78.tar",
-		"http://61.129.70.139:3030/api/view_user_file/?path=/62dcd780-0db6-11e9-855b-bb4c4b386613/data/readnew_1.fq.gz",
-		"http://61.129.70.139:3030/api/view_user_file/?path=/62dcd780-0db6-11e9-855b-bb4c4b386613/upload/1587281476978-PTBP1-1.csv",
+		"https://hiplot.com.cn/api/viewfile/?path=/tmp/hiplot-ox4t9X/cob38g8rgqv.tar",
+		"https://hiplot.com.cn/api/viewfile/?path=/tmp/hiplot-Jcw5fC/s1051on90mh.tar",
+		"https://hiplot.com.cn/api/viewfile/?path=/tmp/hiplot-It8jqd/a7yqy740q78.tar",
+		"https://hiplot.com.cn/api/view_user_file/?path=/62dcd780-0db6-11e9-855b-bb4c4b386613/data/readnew_1.fq.gz",
+		"https://hiplot.com.cn/api/view_user_file/?path=/62dcd780-0db6-11e9-855b-bb4c4b386613/upload/1587281476978-PTBP1-1.csv",
 		"http://www.openbioinformatics.org/annovar/download/hg19_clinvar_20131105.txt.idx.gz",
 		"http://www.openbioinformatics.org/annovar/download/hg19_clinvar_20170130.txt.gz",
 		"http://www.openbioinformatics.org/annovar/download/hg19_clinvar_20170905.txt.gz"}

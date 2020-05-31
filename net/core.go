@@ -310,7 +310,7 @@ func AsyncURL3(url string, destFn string, opt *Params) (err error) {
 }
 
 func makeLogBar(msg string) mpb.BarFiller {
-	return mpb.BarFillerFunc(func(w io.Writer, width int, st *decor.Statistics) {
+	return mpb.BarFillerFunc(func(w io.Writer, _ int, _ decor.Statistics) {
 		fmt.Fprintf(w, msg)
 	})
 }

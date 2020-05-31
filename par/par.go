@@ -27,14 +27,15 @@ var wg sync.WaitGroup
 
 // ClisT is the type of parameters of parTasks
 type ClisT struct {
-	Script      string
-	Index       string
-	Env         string
-	ForceAddIdx string
-	Thread      int
-	TaskID      string
-	LogDir      string
-	SaveLog     bool
+	Script       string
+	Index        string
+	Env          string
+	ForceAddIdx  string
+	Thread       int
+	TaskID       string
+	LogDir       string
+	SaveLog      bool
+	SaveProgerss bool
 	// Verbose: verbose level (0: no output, 1: basic output)
 	Verbose int
 }
@@ -49,6 +50,7 @@ func Tasks(parClis *ClisT) (err error) {
 	var logPrefix string
 	var quiet = parClis.Verbose == 0
 	var saveLog = parClis.SaveLog
+	var saveProgress = parClis.SaveProgerss
 
 	if parClis.SaveLog {
 		if logDir == "" {
@@ -89,7 +91,7 @@ func Tasks(parClis *ClisT) (err error) {
 	sort.Sort(sort.IntSlice(index2))
 
 	sem := make(chan bool, parClis.Thread)
-	p := NewMpb(quiet, saveLog, &logCon)
+	p := NewMpb(quiet, saveProgress, &logCon)
 	wg.Add(len(index2))
 
 	logSlice := []string{}
@@ -209,33 +211,33 @@ func Tasks(parClis *ClisT) (err error) {
 }
 
 // NewMpb create mpb.Progress and with log context
-func NewMpb(quiet bool, saveLog bool, logCon *io.Writer) (p *mpb.Progress) {
+func NewMpb(quiet bool, saveProgress bool, logCon *io.Writer) (p *mpb.Progress) {
 	writers := []io.Writer{
 		*logCon,
 		os.Stderr}
 	fileAndStdoutWriter := io.MultiWriter(writers...)
-	if !quiet && saveLog {
+	if !quiet && saveProgress {
 		p = mpb.New(
 			mpb.WithOutput(fileAndStdoutWriter),
 			mpb.WithDebugOutput(fileAndStdoutWriter),
 			mpb.WithWaitGroup(&wg),
 			mpb.WithWidth(108),
 		)
-	} else if !quiet && !saveLog {
+	} else if !quiet && !saveProgress {
 		p = mpb.New(
 			mpb.WithWaitGroup(&wg),
 			mpb.WithWidth(60),
 			mpb.WithOutput(os.Stderr),
 			mpb.WithDebugOutput(os.Stderr),
 		)
-	} else if quiet && saveLog {
+	} else if quiet && saveProgress {
 		p = mpb.New(
 			mpb.WithOutput(*logCon),
 			mpb.WithDebugOutput(*logCon),
 			mpb.WithWaitGroup(&wg),
 			mpb.WithWidth(108),
 		)
-	} else if quiet && !saveLog {
+	} else if quiet && !saveProgress {
 		p = mpb.New(
 			mpb.WithWaitGroup(&wg),
 			mpb.WithWidth(60),
