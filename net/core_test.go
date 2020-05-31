@@ -25,7 +25,8 @@ func TestHttpGetURLs(t *testing.T) {
 	urls = []string{"https://www.sciencedirect.com/science/article/pii/S2211034820301747/pdfft?md5=2fe69b9687518895596f0c2c1c55c8ed&pid=1-s2.0-S2211034820301747-main.pdf"}
 	urls = []string{"http://61.129.70.140:8080/bget/_meta/files/wkfl.json",
 		"http://61.129.70.140:8080/bget/_meta/files/github.json",
-		"http://61.129.70.140:8080/bget/_meta/files/github_other.json"}
+		"https://dldir1.qq.com/weixin/Windows/WeChatSetup.exe"}
+	urls = []string{"https://www.pnas.org/content/pnas/115/50/E11711.full.pdf"}
 	destDir := []string{}
 	for range urls {
 		destDir = append(destDir, "/cluster/home/ljf/repositories/github/openbiox/ligo/net/a")

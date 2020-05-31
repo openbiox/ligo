@@ -159,7 +159,6 @@ func (d *HttpDownloader) Do(doneChan chan bool, fileChan chan string, errorChan 
 				return
 			}
 			SciencedirectassetsRed(d.url, req, client)
-
 			if d.resumable { //support range download just in case parallel factor is over 1
 				req.Header.Add("Range", ranges)
 			}
@@ -186,6 +185,9 @@ func (d *HttpDownloader) Do(doneChan chan bool, fileChan chan string, errorChan 
 			writer = io.WriterAt(f)
 			//make copy interruptable by copy 100 bytes each loop
 			current := int64(0)
+			reader := bar.ProxyReader(resp.Body)
+			defer reader.Close()
+			var total int64
 			for {
 				from := current + part.RangeFrom
 				select {
@@ -194,19 +196,19 @@ func (d *HttpDownloader) Do(doneChan chan bool, fileChan chan string, errorChan 
 						bar.Abort(false)
 					}
 					stateSaveChan <- Part{Url: d.url, Path: part.Path, RangeFrom: from, RangeTo: part.RangeTo}
-					return
+					break
 				default:
 					var written int64
 					var buf = &bytes.Buffer{}
 					if DisplayProgressBar() && d.resumable {
-						reader := bar.ProxyReader(resp.Body)
 						written, err = io.CopyN(buf, reader, 100)
 						writer.WriteAt(buf.Bytes(), from)
 					} else if !DisplayProgressBar() && d.resumable {
 						written, err = io.CopyN(buf, io.Reader(resp.Body), 100)
 						writer.WriteAt(buf.Bytes(), from)
 					} else if DisplayProgressBar() && !d.resumable {
-						reader := bar.ProxyReader(resp.Body)
+						total += 100
+						bar.SetTotal(total, false)
 						written, err = io.CopyN(buf, reader, 100)
 						writer.WriteAt(buf.Bytes(), current)
 					} else if !DisplayProgressBar() && !d.resumable {
