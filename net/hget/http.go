@@ -196,7 +196,7 @@ func (d *HttpDownloader) Do(doneChan chan bool, fileChan chan string, errorChan 
 						bar.Abort(false)
 					}
 					stateSaveChan <- Part{Url: d.url, Path: part.Path, RangeFrom: from, RangeTo: part.RangeTo}
-					break
+					return
 				default:
 					var written int64
 					var buf = &bytes.Buffer{}
@@ -221,9 +221,11 @@ func (d *HttpDownloader) Do(doneChan chan bool, fileChan chan string, errorChan 
 							stateSaveChan <- Part{Url: d.url, Path: part.Path, RangeFrom: from, RangeTo: part.RangeTo}
 							bar.Abort(false)
 							errorChan <- err
+							return
 						} else if err != io.EOF {
 							stateSaveChan <- Part{Url: d.url, Path: part.Path, RangeFrom: from, RangeTo: part.RangeTo}
 							errorChan <- err
+							return
 						}
 						if DisplayProgressBar() {
 							bar.Completed()
