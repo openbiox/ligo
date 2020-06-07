@@ -101,9 +101,15 @@ func Execute(url string, state *State, conn int, skiptls bool, dest string, pbg 
 		case err := <-errorChan:
 			filler := makeLogBar(err.Error())
 			pbg.Add(0, filler).SetTotal(0, true)
-			s := &State{Url: url, Parts: parts}
-			s.Save(dest)
-			return err
+			isInterrupted = true
+			if DisplayProgressBar() {
+				for i := range bars {
+					bars[i].Abort(false)
+				}
+			}
+			for i := 0; i < conn; i++ {
+				interruptChan <- true
+			}
 		case part := <-stateChan:
 			parts = append(parts, part)
 		case <-doneChan:
