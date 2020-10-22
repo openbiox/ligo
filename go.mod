@@ -4,29 +4,23 @@ go 1.15
 
 require (
 	github.com/PuerkitoBio/goquery v1.6.0
-	github.com/andybalholm/cascadia v1.2.0 // indirect
-	github.com/antchfx/htmlquery v1.2.3 // indirect
 	github.com/antchfx/xmlquery v1.3.3 // indirect
 	github.com/antonfisher/nested-logrus-formatter v1.3.0
 	github.com/dsnet/compress v0.0.1 // indirect
 	github.com/fatih/color v1.9.0
 	github.com/frankban/quicktest v1.11.1 // indirect
-	github.com/gobwas/glob v0.2.3 // indirect
-	github.com/gocolly/colly v1.2.0
+	github.com/gocolly/colly/v2 v2.1.0
 	github.com/golang/protobuf v1.4.3 // indirect
 	github.com/golang/snappy v0.0.2 // indirect
 	github.com/jdkato/prose/v2 v2.0.0
 	github.com/json-iterator/go v1.1.10
-	github.com/kennygrant/sanitize v1.2.4 // indirect
 	github.com/mattn/go-colorable v0.1.8
 	github.com/mattn/go-isatty v0.0.12
 	github.com/mholt/archiver v3.1.1+incompatible
 	github.com/nwaples/rardecode v1.1.0 // indirect
 	github.com/pierrec/lz4 v2.5.2+incompatible // indirect
-	github.com/saintfish/chardet v0.0.0-20120816061221-3af4cd4741ca // indirect
 	github.com/sirupsen/logrus v1.7.0
 	github.com/spf13/cobra v1.1.1
-	github.com/temoto/robotstxt v1.1.1 // indirect
 	github.com/tidwall/pretty v1.0.2
 	github.com/ulikunitz/xz v0.5.8 // indirect
 	github.com/vbauerster/mpb/v5 v5.3.0
