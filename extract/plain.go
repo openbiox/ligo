@@ -5,7 +5,7 @@ import (
 
 	"github.com/openbiox/ligo/slice"
 	"github.com/openbiox/ligo/stringo"
-	prose "gopkg.in/jdkato/prose.v2"
+	prose "github.com/jdkato/prose/v2"
 	xurls "mvdan.cc/xurls/v2"
 )
 

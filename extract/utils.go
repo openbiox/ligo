@@ -11,7 +11,7 @@ import (
 	clog "github.com/openbiox/ligo/log"
 	"github.com/openbiox/ligo/slice"
 	"github.com/openbiox/ligo/stringo"
-	prose "gopkg.in/jdkato/prose.v2"
+	prose "github.com/jdkato/prose/v2"
 )
 
 var log = clog.Logger
