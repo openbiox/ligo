@@ -3,7 +3,6 @@ package fmt
 import (
 	"bytes"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 
@@ -50,7 +49,7 @@ func PrettyJSON(fmtClis *ClisT, thread int) {
 			}()
 			outfn := stringo.StrReplaceAll(fn, "json$", "pretty.json")
 			(*fmtClis.Files)[k] = outfn
-			d, err := ioutil.ReadFile(fn)
+			d, err := os.ReadFile(fn)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -102,7 +101,7 @@ func JSON2Slice(fmtClis *ClisT, thread int) {
 			if len((*fmtClis.JSON)[k]) > 0 {
 				m = (*fmtClis.JSON)[k]
 			} else {
-				d, err = ioutil.ReadFile(fn)
+				d, err = os.ReadFile(fn)
 				if err != nil {
 					log.Fatal(err)
 				}

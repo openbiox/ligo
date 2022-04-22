@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"io"
-	"io/ioutil"
 	"os"
 
 	clog "github.com/openbiox/ligo/log"
@@ -44,7 +43,7 @@ func PubmedXML(xmlPaths *[]string, stdin *[]byte, outfn string, keywords *[]stri
 			}()
 			var pubmed = PubmedArticleSet{}
 			if xmlPath != "ParsePubmedXMLStdin" {
-				xmlData, err := ioutil.ReadFile(xmlPath)
+				xmlData, err := os.ReadFile(xmlPath)
 				if err != nil {
 					log.Warnln(err)
 				}

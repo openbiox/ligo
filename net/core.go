@@ -19,8 +19,8 @@ import (
 
 	cio "github.com/openbiox/ligo/io"
 	"github.com/openbiox/ligo/net/hget"
-	mpb "github.com/vbauerster/mpb/v5"
-	"github.com/vbauerster/mpb/v5/decor"
+	mpb "github.com/vbauerster/mpb/v7"
+	"github.com/vbauerster/mpb/v7/decor"
 )
 
 // HTTPGetURLs can use golang http.Get and external commandline tools including wget, curl, axel, git and rsync

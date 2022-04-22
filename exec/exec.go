@@ -2,7 +2,6 @@ package exec
 
 import (
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
@@ -48,7 +47,7 @@ func System(cmd *exec.Cmd, logPath string, quiet bool) error {
 			log.SetOutput(io.MultiWriter(os.Stderr, logCon))
 		}
 	} else if quiet {
-		log.SetOutput(ioutil.Discard)
+		log.SetOutput(io.Discard)
 	}
 	logBash.Info(cmdStr)
 	err1 := cmd.Start()

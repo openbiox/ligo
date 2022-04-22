@@ -14,8 +14,8 @@ import (
 	"sync"
 	"unicode/utf8"
 
-	mpb "github.com/vbauerster/mpb/v5"
-	"github.com/vbauerster/mpb/v5/decor"
+	mpb "github.com/vbauerster/mpb/v7"
+	"github.com/vbauerster/mpb/v7/decor"
 )
 
 var (
@@ -117,7 +117,6 @@ func (d *HttpDownloader) Do(doneChan chan bool, fileChan chan string, errorChan 
 			}
 			newbar := pbg.AddBar(size,
 				mpb.BarNoPop(),
-				mpb.BarStyle("[=>-|"),
 				mpb.PrependDecorators(
 					decor.Name(prefixStr, decor.WC{W: len(prefixStr) + 1, C: decor.DidentRight}),
 					decor.CountersKibiByte("% -.1f / % -.1f\t"),

@@ -2,7 +2,6 @@ package log
 
 import (
 	"io"
-	"io/ioutil"
 	"os"
 
 	nested "github.com/antonfisher/nested-logrus-formatter"
@@ -40,7 +39,7 @@ func New2() *logrus.Logger {
 // SetQuietLog Set quiet log
 func SetQuietLog(log *logrus.Logger, quite bool) {
 	if quite {
-		log.SetOutput(ioutil.Discard)
+		log.SetOutput(io.Discard)
 	} else {
 		log.SetOutput(os.Stderr)
 	}
@@ -49,7 +48,7 @@ func SetQuietLog(log *logrus.Logger, quite bool) {
 // SetLogStream set log output stream
 func SetLogStream(log *logrus.Logger, quiet bool, saveLog bool, logCon *io.Writer) {
 	if quiet && !saveLog {
-		log.SetOutput(ioutil.Discard)
+		log.SetOutput(io.Discard)
 	} else if quiet && saveLog {
 		log.SetOutput(*logCon)
 	} else if !quiet && saveLog {

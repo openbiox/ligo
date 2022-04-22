@@ -3,7 +3,6 @@ package par
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"os/user"
@@ -19,8 +18,8 @@ import (
 	cio "github.com/openbiox/ligo/io"
 	clog "github.com/openbiox/ligo/log"
 	"github.com/openbiox/ligo/stringo"
-	"github.com/vbauerster/mpb/v5"
-	"github.com/vbauerster/mpb/v5/decor"
+	"github.com/vbauerster/mpb/v7"
+	"github.com/vbauerster/mpb/v7/decor"
 )
 
 var wg sync.WaitGroup
@@ -123,7 +122,6 @@ func Tasks(parClis *ClisT) (err error) {
 		bar := p.AddBar(int64(total),
 			mpb.BarNoPop(),
 			mpb.BarID(i),
-			mpb.BarStyle("╢=>-╟"),
 			// override mpb.DefaultSpinnerStyle
 			mpb.PrependDecorators(
 				// simple name decorator
@@ -241,8 +239,8 @@ func NewMpb(quiet bool, saveProgress bool, logCon *io.Writer) (p *mpb.Progress) 
 		p = mpb.New(
 			mpb.WithWaitGroup(&wg),
 			mpb.WithWidth(60),
-			mpb.WithOutput(ioutil.Discard),
-			mpb.WithDebugOutput(ioutil.Discard),
+			mpb.WithOutput(io.Discard),
+			mpb.WithDebugOutput(io.Discard),
 		)
 	}
 	return p

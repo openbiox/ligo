@@ -1,6 +1,7 @@
 package stringo
 
 import (
+	"log"
 	"strings"
 	"testing"
 )

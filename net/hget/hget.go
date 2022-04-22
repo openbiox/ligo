@@ -12,8 +12,8 @@ import (
 
 	cio "github.com/openbiox/ligo/io"
 	clog "github.com/openbiox/ligo/log"
-	"github.com/vbauerster/mpb/v5"
-	"github.com/vbauerster/mpb/v5/decor"
+	"github.com/vbauerster/mpb/v7"
+	"github.com/vbauerster/mpb/v7/decor"
 )
 
 var log = clog.Logger

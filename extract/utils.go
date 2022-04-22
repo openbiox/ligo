@@ -1,7 +1,7 @@
 package extract
 
 import (
-	"io/ioutil"
+	"io"
 	"os"
 	"path/filepath"
 	"sort"
@@ -24,7 +24,7 @@ func readDocFile(filename string) (dat []byte, err error) {
 	if of, err = os.Open(filename); err != nil {
 		return nil, err
 	}
-	if dat, err = ioutil.ReadAll(of); err != nil {
+	if dat, err = io.ReadAll(of); err != nil {
 		return nil, err
 	}
 	defer of.Close()

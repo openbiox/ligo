@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path"
 
 	cio "github.com/openbiox/ligo/io"
-	mpb "github.com/vbauerster/mpb/v5"
+	mpb "github.com/vbauerster/mpb/v7"
 )
 
 type State struct {
@@ -29,7 +29,7 @@ func (s *State) Save(dest string) error {
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile(dest+".st", j, 0644)
+	return os.WriteFile(dest+".st", j, 0644)
 }
 
 func Read(task string, pbg *mpb.Progress, dest string) (*State, error) {
@@ -42,7 +42,7 @@ func Read(task string, pbg *mpb.Progress, dest string) (*State, error) {
 		pbg.Add(0, filler).SetTotal(0, true)
 		return nil, errors.New("state not existed")
 	}
-	bytes, err := ioutil.ReadFile(file)
+	bytes, err := os.ReadFile(file)
 	if err != nil {
 		return nil, err
 	}

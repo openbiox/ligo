@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	mpb "github.com/vbauerster/mpb/v5"
+	mpb "github.com/vbauerster/mpb/v7"
 )
 
 func TestHttpGetURLs(t *testing.T) {

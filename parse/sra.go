@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/xml"
 	"io"
-	"io/ioutil"
 	"os"
 
 	jsoniter "github.com/json-iterator/go"
@@ -41,7 +40,7 @@ func SraXML(xmlPaths *[]string, stdin *[]byte, outfn string, keywords *[]string,
 			}()
 			var sra = SraSets{}
 			if xmlPath != "ParseSraXMLStdin" {
-				xmlData, err := ioutil.ReadFile(xmlPath)
+				xmlData, err := os.ReadFile(xmlPath)
 				if err != nil {
 					log.Warnln(err)
 				}

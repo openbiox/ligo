@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -14,13 +13,13 @@ import (
 
 	cio "github.com/openbiox/ligo/io"
 	"github.com/openbiox/ligo/stringo"
-	mpb "github.com/vbauerster/mpb/v5"
-	"github.com/vbauerster/mpb/v5/decor"
+	mpb "github.com/vbauerster/mpb/v7"
+	"github.com/vbauerster/mpb/v7/decor"
 )
 
 func checkHTTPGetURLRdirect(resp *http.Response, url string, destFn string, opt *Params) (status bool) {
 	if strings.Contains(url, "https://www.sciencedirect.com") {
-		v, err := ioutil.ReadAll(resp.Body)
+		v, err := io.ReadAll(resp.Body)
 		if err == nil {
 			if stringo.StrDetect(string(v), "https://pdf.sciencedirectassets.com") {
 				url = stringo.StrExtract(string(v), `https://pdf.sciencedirectassets.com/.*&type=client`, 1)[0]
@@ -113,7 +112,6 @@ func downloadWorker(client *http.Client, req *http.Request, url string, destFn s
 	if !opt.Quiet {
 		bar := opt.Pbar.AddBar(int64(size),
 			mpb.BarNoPop(),
-			mpb.BarStyle("[=>-|"),
 			mpb.PrependDecorators(
 				decor.Name(prefixStr, decor.WC{W: len(prefixStr) + 1, C: decor.DidentRight}),
 				decor.CountersKibiByte("% -.1f / % -.1f\t"),
